@@ -25,7 +25,6 @@ func main() {
 			key := fmt.Sprintf("key-%d", i)
 			value := fmt.Sprintf("value-%d", i)
 			c.Add(key, value)
-			c.Get(key)
 			wg.Done()
 		}()
 	}
