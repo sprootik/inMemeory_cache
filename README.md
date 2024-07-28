@@ -5,6 +5,9 @@ Algorithmic classification of O(1) work.
 
 *** 
 ### Installation  
+```
+go get github.com/sprootik/inMemeory_cache@latest
+```
 
 ***
 ### Examples of using  
