@@ -8,16 +8,16 @@ import (
 )
 
 func main() {
-	// initiate a new c with an item lifetime of 1 seconds
+	// initiate a new cache with an item lifetime of 1 seconds
 	c := cache.NewCache(&sync.RWMutex{}, 1*time.Second)
 
-	// start executor
+	// start cache executor
 	err := c.StartCacheExecutor()
 	if err != nil {
 		panic(err)
 	}
 
-	// add 1000 elements in c
+	// add 1000 elements in cache
 	var wg sync.WaitGroup
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
@@ -31,10 +31,10 @@ func main() {
 	}
 	wg.Wait()
 
-	// show c size
+	// show cache size
 	fmt.Printf("c size: %d\n", c.CacheSize())
 
-	// get value from c by key
+	// get value from cache by key
 	key := "key-666"
 	value, ok := c.Get(key)
 	if !ok {
