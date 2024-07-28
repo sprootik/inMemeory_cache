@@ -11,16 +11,23 @@ Algorithmic classification of O(1) work.
 ***
 ### Performance test    
 
-#### CPU 
-
 ```
-added 360772 elements in cache
-Cache size befor clean: 360348, Cache size after clean: 0
-  360772              3897 ns/op
-```
-#### Memory
-```
-added 352123 elements in cache
-Cache size befor clean: 351749, Cache size after clean: 0
-  352123              3664 ns/op             667 B/op          8 allocs/op
+=== CPU bench ===
+goos: linux
+goarch: amd64
+pkg: cache
+cpu: AMD Ryzen 7 6800H with Radeon Graphics         
+BenchmarkCache
+BenchmarkCache-16         367285              3603 ns/op
+PASS
+ok      cache   1.379s
+================++
+=== MEM bench ===
+goos: linux
+goarch: amd64
+pkg: cache
+cpu: AMD Ryzen 7 6800H with Radeon Graphics         
+BenchmarkCache-16         314948              3264 ns/op             671 B/op          8 allocs/op
+PASS
+ok      cache   1.087s
 ```

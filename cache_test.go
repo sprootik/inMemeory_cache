@@ -100,8 +100,8 @@ func BenchmarkCache(b *testing.B) {
 	wg.Wait()
 	b.StopTimer()
 
-	fmt.Printf("added %d elements in cache\n", b.N)
-	fmt.Printf("Cache size befor clean: %d, ", cache.CacheSize())
-	time.Sleep(1 * time.Second)
-	fmt.Printf("Cache size after clean: %d\n", cache.CacheSize())
+	// fmt.Printf("added %d elements in cache\n", b.N)
+	// fmt.Printf("Cache size befor clean: %d, ", cache.CacheSize())
+	// time.Sleep(1 * time.Second)
+	// fmt.Printf("Cache size after clean: %d\n", cache.CacheSize())
 }
