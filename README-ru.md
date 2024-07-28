@@ -22,7 +22,7 @@ BenchmarkCache
 BenchmarkCache-16         367285              3603 ns/op
 PASS
 ok      cache   1.379s
-================++
+==================
 === MEM bench ===
 goos: linux
 goarch: amd64
