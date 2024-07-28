@@ -8,6 +8,7 @@ go get github.com/sprootik/inMemeory_cache@latest
 ```
 ***
 ### Примеры использования
+Смотри [example](./examples/main.go)
 ***
 ### Тест производительности  
 

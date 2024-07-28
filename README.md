@@ -11,6 +11,7 @@ go get github.com/sprootik/inMemeory_cache@latest
 
 ***
 ### Examples of using  
+See [example](./examples/main.go)
 ***
 ### Performance test    
 
