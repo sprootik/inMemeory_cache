@@ -17,7 +17,7 @@ testCacheTrace:
 	go tool trace cache/tests/trace.out
 
 testCacheBench:
-	@echo "=== CPU benc ==="
+	@echo "=== CPU bench ==="
 	@go test -bench=. -run ^BenchmarkCache$$ cache/cache
 	@echo "================++"
 	@echo "=== MEM bench ==="
