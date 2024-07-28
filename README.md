@@ -1,7 +1,7 @@
 Eng | [Rus](./README-ru.md)   
 
-This project implements a thread-safe in-memory thread with time-based cache cleanup.
-Algorithmic classification of O(1) work.
+This project implements a thread-safe in-memory cache with delete based on the element's lifetime.
+Algorithmic complexity of work is O(1). 
 
 *** 
 ### Installation  

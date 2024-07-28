@@ -2,7 +2,7 @@
 /*
 the package implements in-memory cache with element life time.
 This cache is thread safe.
-Algorithmic complexity of work O(1).
+Algorithmic complexity of work is O(1).
 */
 package cache
 
