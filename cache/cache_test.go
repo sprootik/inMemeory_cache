@@ -85,22 +85,23 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	count := 100000
-
 	var wg sync.WaitGroup
-	for i := 0; i < count; i++ {
+	b.StartTimer()
+	for j := 0; j < b.N; j++ {
 		wg.Add(1)
 		go func() {
-			key := fmt.Sprintf("key-%d", i)
-			value := fmt.Sprintf("value-%d", i)
+			key := fmt.Sprintf("key-%d", j)
+			value := fmt.Sprintf("value-%d", j)
 			cache.Add(key, value)
 			cache.Get(key)
 			wg.Done()
 		}()
 	}
 	wg.Wait()
+	b.StopTimer()
 
-	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	fmt.Printf("added %d elements in cache\n", b.N)
+	fmt.Printf("Cache size befor clean: %d, ", cache.CacheSize())
 	time.Sleep(1 * time.Second)
-	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	fmt.Printf("Cache size after clean: %d\n", cache.CacheSize())
 }
