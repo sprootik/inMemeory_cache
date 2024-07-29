@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-var (
-	once         sync.Once
-	instantiated *Cache
-)
-
 // node linked list cache element
 type node struct {
 	key      string
@@ -27,30 +22,30 @@ type node struct {
 
 // Cache cache structure
 type Cache struct {
-	size          int
-	capacity      int
-	head          *node
-	tail          *node
-	data          map[string]*node
-	mu            *sync.RWMutex
-	lifeTime      time.Duration
-	isRunExecutor bool
+	size     int
+	capacity int
+	head     *node
+	tail     *node
+	data     map[string]*node
+	mu       *sync.RWMutex
+	lifeTime time.Duration
 }
 
-// NewCache init new cache, it's the singleton
-func NewCache(mu *sync.RWMutex, capacity int, lifeTime time.Duration) *Cache {
-	once.Do(func() {
-		instantiated = &Cache{
-			mu: mu,
-			//head, tail:  nil,
-			//size:  0,
-			capacity: capacity,
-			data:     make(map[string]*node),
-			//index:    make(map[int]*node),
-			lifeTime: lifeTime,
-		}
-	})
-	return instantiated
+// NewCache init new cache.
+/* capacity: this is the capacity of the lru cache. If the number of added elements is greater
+than the capacity the last element is removed
+
+nodeLifeTime: cache item lifetime
+*/
+func NewCache(mu *sync.RWMutex, capacity int, nodeLifeTime time.Duration) *Cache {
+	return &Cache{
+		mu: mu,
+		//head, tail:  nil,
+		//size:  0,
+		capacity: capacity,
+		data:     make(map[string]*node),
+		lifeTime: nodeLifeTime,
+	}
 }
 
 // CacheSize number of items in the cache at the moment
@@ -101,11 +96,12 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 	}
 
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	if time.Since(node.time) > c.lifeTime {
 		c.unsafeRemove(node)
 		delete(c.data, key)
+		return nil, false
 	}
-	c.mu.Unlock()
 
 	return node.value, true
 }

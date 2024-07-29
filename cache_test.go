@@ -37,30 +37,26 @@ func TestCacheCorrectWork(t *testing.T) {
 			value := fmt.Sprintf("value-%d", i)
 			cache.Add(key, value)
 			fmt.Printf("add Node: k:%s v:%s\n", key, value)
-			time.Sleep(1 * time.Second)
 		}()
 	}
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
 	printCacheElement()
 
-	element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
-	fmt.Println("**********")
-	if ok {
-		fmt.Printf("element in cache: %s\n", element)
-	} else {
-		fmt.Println("not found in cache")
-	}
-	fmt.Println("**********")
+	for i := 0; i < 2; i++ {
+		element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
+		fmt.Println("**********")
+		if ok {
+			fmt.Printf("element in cache: %s\n", element)
+		} else {
+			fmt.Println("not found in cache")
+		}
+		fmt.Println("**********")
 
-	for i := 0; i < 5; i++ {
 		time.Sleep(1 * time.Second)
-		//val, ok := cache.Get(fmt.Sprintf("%d", i))
-		//if ok {
-		//	fmt.Printf("element in cache: %s\n", val)
-		//}
 		fmt.Printf("Cache size: %d\n", cache.CacheSize())
 		printCacheElement()
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -79,9 +75,6 @@ func TestCache(t *testing.T) {
 	wg.Wait()
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
-	//time.Sleep(1 * time.Second)
-	//fmt.Printf("Cache size: %d\n", cache.CacheSize())
-
 }
 
 func BenchmarkCache(b *testing.B) {
