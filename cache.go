@@ -101,7 +101,7 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 	}
 
 	c.mu.Lock()
-	if node.time.Before(time.Now()) {
+	if time.Since(node.time) > c.lifeTime {
 		c.unsafeRemove(node)
 		delete(c.data, key)
 	}

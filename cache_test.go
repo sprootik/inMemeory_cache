@@ -44,7 +44,7 @@ func TestCacheCorrectWork(t *testing.T) {
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
 	printCacheElement()
 
-	element, ok := cache.Get(fmt.Sprintf("%d", 4))
+	element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
 	fmt.Println("**********")
 	if ok {
 		fmt.Printf("element in cache: %s\n", element)
@@ -55,7 +55,10 @@ func TestCacheCorrectWork(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		time.Sleep(1 * time.Second)
-
+		//val, ok := cache.Get(fmt.Sprintf("%d", i))
+		//if ok {
+		//	fmt.Printf("element in cache: %s\n", val)
+		//}
 		fmt.Printf("Cache size: %d\n", cache.CacheSize())
 		printCacheElement()
 	}
@@ -76,8 +79,8 @@ func TestCache(t *testing.T) {
 	wg.Wait()
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
-	time.Sleep(1 * time.Second)
-	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	//time.Sleep(1 * time.Second)
+	//fmt.Printf("Cache size: %d\n", cache.CacheSize())
 
 }
 
