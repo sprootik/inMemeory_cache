@@ -72,6 +72,9 @@ func (c *Cache) Add(key string, value interface{}) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	if _, ok := c.index[key]; ok {
+		return
+	}
 
 	if c.head == nil && c.tail == nil {
 		c.head = element

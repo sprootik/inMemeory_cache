@@ -19,19 +19,19 @@ See [example](./examples/main.go)
 === CPU bench ===
 goos: linux
 goarch: amd64
-pkg: cache
+pkg: github.com/sprootik/inMemeory_cache
 cpu: AMD Ryzen 7 6800H with Radeon Graphics         
 BenchmarkCache
-BenchmarkCache-16         367285              3603 ns/op
+BenchmarkCache-16         975109              1543 ns/op
 PASS
-ok      cache   1.379s
+ok      github.com/sprootik/inMemeory_cache     1.537s
 ==================
 === MEM bench ===
 goos: linux
 goarch: amd64
-pkg: cache
+pkg: github.com/sprootik/inMemeory_cache
 cpu: AMD Ryzen 7 6800H with Radeon Graphics         
-BenchmarkCache-16         314948              3264 ns/op             671 B/op          8 allocs/op
+BenchmarkCache-16        1000000              1544 ns/op             681 B/op          4 allocs/op
 PASS
-ok      cache   1.087s
+ok      github.com/sprootik/inMemeory_cache     1.578s
 ```

@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -90,18 +91,12 @@ func BenchmarkCache(b *testing.B) {
 	for j := 0; j < b.N; j++ {
 		wg.Add(1)
 		go func() {
-			key := fmt.Sprintf("key-%d", j)
-			value := fmt.Sprintf("value-%d", j)
-			cache.Add(key, value)
+			key := strconv.Itoa(j)
+			cache.Add(key, "value")
 			cache.Get(key)
 			wg.Done()
 		}()
 	}
 	wg.Wait()
 	b.StopTimer()
-
-	// fmt.Printf("added %d elements in cache\n", b.N)
-	// fmt.Printf("Cache size befor clean: %d, ", cache.CacheSize())
-	// time.Sleep(1 * time.Second)
-	// fmt.Printf("Cache size after clean: %d\n", cache.CacheSize())
 }
