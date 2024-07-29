@@ -32,11 +32,11 @@ type Cache struct {
 }
 
 /*
-	NewCache init new cache.
+NewCache init new cache.
 
-capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
+	capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
 
-nodeLifeTime: cache item lifetime
+	nodeLifeTime: cache item lifetime
 */
 func NewCache(mu *sync.RWMutex, capacity int, nodeLifeTime time.Duration) *Cache {
 	return &Cache{
