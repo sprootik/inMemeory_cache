@@ -11,11 +11,7 @@ import (
 var cache *Cache
 
 func init() {
-	cache = NewCache(&sync.RWMutex{}, 1*time.Second)
-	err := cache.StartCacheExecutor()
-	if err != nil {
-		panic(err)
-	}
+	cache = NewCache(&sync.RWMutex{}, 4, 1*time.Second)
 }
 
 func printCacheElement() {
@@ -23,7 +19,7 @@ func printCacheElement() {
 	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
 
 	fmt.Println("----------")
-	for _, v := range cache.index {
+	for _, v := range cache.data {
 		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
 	}
 	cache.mu.RUnlock()
@@ -37,7 +33,7 @@ func TestCacheCorrectWork(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		func() {
-			key := fmt.Sprintf("%d", i)
+			key := fmt.Sprintf("key-%d", i)
 			value := fmt.Sprintf("value-%d", i)
 			cache.Add(key, value)
 			fmt.Printf("add Node: k:%s v:%s\n", key, value)
