@@ -31,9 +31,10 @@ type Cache struct {
 	lifeTime time.Duration
 }
 
-// NewCache init new cache.
-/* capacity: this is the capacity of the lru cache. If the number of added elements is greater
-than the capacity the last element is removed
+/*
+	NewCache init new cache.
+
+capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
 
 nodeLifeTime: cache item lifetime
 */
