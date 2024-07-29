@@ -87,32 +87,47 @@ func (c *Cache) Add(key string, value interface{}) {
 	}
 
 	c.data[key] = element
-	//c.index[c.size] = element
 	c.size++
 }
 
 // Get get from cache by key
 func (c *Cache) Get(key string) (interface{}, bool) {
 	c.mu.RLock()
-	val, ok := c.data[key]
+	node, ok := c.data[key]
 	c.mu.RUnlock()
+
 	if !ok {
 		return nil, false
 	}
-	return val.value, true
+
+	c.mu.Lock()
+	if node.time.Before(time.Now()) {
+		c.unsafeRemove(node)
+		delete(c.data, key)
+	}
+	c.mu.Unlock()
+
+	return node.value, true
 }
 
+// unsafeRemove thread-unsafe removal of an element from a linked-list
 func (c *Cache) unsafeRemove(node *node) {
-	if node.next == nil && node.previous == nil {
+	if node.next != nil && node.previous != nil {
 		node.previous.next = node.next.previous
 		node.next.previous = node.previous.next
 		delete(c.data, node.key)
 	} else if node.previous == nil && node.next != nil {
+		c.tail = node.next
 		node.next.previous = nil
 		delete(c.data, node.key)
 	} else if node.next == nil && node.previous != nil {
+		c.head = node.previous
 		node.previous.next = nil
 		delete(c.data, node.key)
+	} else {
+		delete(c.data, node.key)
+		c.head = nil
+		c.tail = nil
 	}
 	c.size--
 }
