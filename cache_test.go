@@ -11,7 +11,7 @@ import (
 var cache *Cache
 
 func init() {
-	cache = NewCache(&sync.RWMutex{}, 4, 1*time.Second)
+	cache = NewCache(&sync.RWMutex{}, 1000, 1*time.Second)
 }
 
 func printCacheElement() {
@@ -28,7 +28,7 @@ func printCacheElement() {
 
 func TestCacheCorrectWork(t *testing.T) {
 	cache.mu.Lock()
-	cache.lifeTime = 6 * time.Second
+	cache.capacity = 4
 	cache.mu.Unlock()
 
 	for i := 0; i < 5; i++ {

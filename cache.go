@@ -113,8 +113,8 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 // unsafeRemove thread-unsafe removal of an element from a linked-list
 func (c *Cache) unsafeRemove(node *node) {
 	if node.next != nil && node.previous != nil {
-		node.previous.next = node.next.previous
-		node.next.previous = node.previous.next
+		node.previous.next = node.next
+		node.next.previous = node.previous
 		delete(c.data, node.key)
 	} else if node.previous == nil && node.next != nil {
 		c.tail = node.next
@@ -131,29 +131,3 @@ func (c *Cache) unsafeRemove(node *node) {
 	}
 	c.size--
 }
-
-//
-//func (c *Cache) cacheExecutor() {
-//	c.mu.RLock()
-//	cacheSize := c.size
-//	tailElement := c.tail
-//	lifeTime := c.lifeTime
-//	c.mu.RUnlock()
-//
-//	if cacheSize > 0 {
-//		if time.Since(tailElement.time) > lifeTime {
-//			c.mu.Lock()
-//			defer c.mu.Unlock()
-//
-//			delete(c.data, c.tail.key)
-//			c.size--
-//			if c.size == 0 {
-//				c.head = nil
-//				c.tail = nil
-//				return
-//			}
-//			c.tail = c.tail.next
-//			c.tail.previous = nil
-//		}
-//	}
-//}
