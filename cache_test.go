@@ -11,11 +11,7 @@ import (
 var cache *Cache
 
 func init() {
-	cache = NewCache(&sync.RWMutex{}, 1*time.Second)
-	err := cache.StartCacheExecutor()
-	if err != nil {
-		panic(err)
-	}
+	cache = NewCache(&sync.RWMutex{}, 1000, 1*time.Second)
 }
 
 func printCacheElement() {
@@ -23,7 +19,7 @@ func printCacheElement() {
 	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
 
 	fmt.Println("----------")
-	for _, v := range cache.index {
+	for _, v := range cache.data {
 		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
 	}
 	cache.mu.RUnlock()
@@ -32,36 +28,35 @@ func printCacheElement() {
 
 func TestCacheCorrectWork(t *testing.T) {
 	cache.mu.Lock()
-	cache.lifeTime = 6 * time.Second
+	cache.capacity = 4
 	cache.mu.Unlock()
 
 	for i := 0; i < 5; i++ {
 		func() {
-			key := fmt.Sprintf("%d", i)
+			key := fmt.Sprintf("key-%d", i)
 			value := fmt.Sprintf("value-%d", i)
 			cache.Add(key, value)
 			fmt.Printf("add Node: k:%s v:%s\n", key, value)
-			time.Sleep(1 * time.Second)
 		}()
 	}
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
 	printCacheElement()
 
-	element, ok := cache.Get(fmt.Sprintf("%d", 4))
-	fmt.Println("**********")
-	if ok {
-		fmt.Printf("element in cache: %s\n", element)
-	} else {
-		fmt.Println("not found in cache")
-	}
-	fmt.Println("**********")
+	for i := 0; i < 2; i++ {
+		element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
+		fmt.Println("**********")
+		if ok {
+			fmt.Printf("element in cache: %s\n", element)
+		} else {
+			fmt.Println("not found in cache")
+		}
+		fmt.Println("**********")
 
-	for i := 0; i < 5; i++ {
 		time.Sleep(1 * time.Second)
-
 		fmt.Printf("Cache size: %d\n", cache.CacheSize())
 		printCacheElement()
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -80,9 +75,6 @@ func TestCache(t *testing.T) {
 	wg.Wait()
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
-	time.Sleep(1 * time.Second)
-	fmt.Printf("Cache size: %d\n", cache.CacheSize())
-
 }
 
 func BenchmarkCache(b *testing.B) {

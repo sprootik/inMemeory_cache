@@ -9,17 +9,12 @@ import (
 
 func main() {
 	// initiate a new cache with an item lifetime of 1 seconds
-	c := cache.NewCache(&sync.RWMutex{}, 1*time.Second)
+	c := cache.NewCache(&sync.RWMutex{}, 1000, 1*time.Second)
 
-	// start cache executor
-	err := c.StartCacheExecutor()
-	if err != nil {
-		panic(err)
-	}
-
-	// add 1000 elements in cache
+	// add 1001 elements in cache.
+	// The cache will only have the last 1000 elements since the capacity is 1000
 	var wg sync.WaitGroup
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 1001; i++ {
 		wg.Add(1)
 		go func() {
 			key := fmt.Sprintf("key-%d", i)
@@ -33,16 +28,18 @@ func main() {
 	// show cache size
 	fmt.Printf("c size: %d\n", c.CacheSize())
 
-	// get value from cache by key
-	key := "key-666"
-	value, ok := c.Get(key)
-	if !ok {
-		fmt.Println("key not found")
-	} else {
-		fmt.Printf("key: %s found in cache, value: %s\n", key, value)
+	// get value from cache by key. After second.
+	// after a second, the elements are considered not relevant, since the lifetime is 1 second.
+	// The element will be removed from the cache upon request
+	for i := 0; i < 2; i++ {
+		key := "key-666"
+		value, ok := c.Get(key)
+		if !ok {
+			fmt.Println("key not found")
+		} else {
+			fmt.Printf("key: %s found in cache, value: %s\n", key, value)
+		}
+		fmt.Printf("c size: %d\n", c.CacheSize())
+		time.Sleep(1 * time.Second)
 	}
-
-	// waiting for c to be cleared
-	time.Sleep(1 * time.Second)
-	fmt.Printf("c size: %d\n", c.CacheSize())
 }

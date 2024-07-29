@@ -1,20 +1,14 @@
 // Package cache
 /*
-the package implements in-memory cache with element life time.
+the package implements in-memory LRU cache consisting of elements with life time.
 This cache is thread safe.
 Algorithmic complexity of work is O(1).
 */
 package cache
 
 import (
-	"fmt"
 	"sync"
 	"time"
-)
-
-var (
-	once         sync.Once
-	instantiated *Cache
 )
 
 // node linked list cache element
@@ -28,34 +22,30 @@ type node struct {
 
 // Cache cache structure
 type Cache struct {
-	size          int
-	head          *node
-	tail          *node
-	index         map[string]*node
-	mu            *sync.RWMutex
-	lifeTime      time.Duration
-	isRunExecutor bool
+	size     int
+	capacity int
+	head     *node
+	tail     *node
+	data     map[string]*node
+	mu       *sync.RWMutex
+	lifeTime time.Duration
 }
 
-// NewCache init new cache, it's the singleton
-func NewCache(mu *sync.RWMutex, lifeTime time.Duration) *Cache {
-	once.Do(func() {
-		instantiated = &Cache{
-			mu: mu,
-			//head, tail:  nil,
-			//size:  0,
-			index:    make(map[string]*node),
-			lifeTime: lifeTime,
-		}
-	})
-	return instantiated
-}
+// NewCache init new cache.
+/* capacity: this is the capacity of the lru cache. If the number of added elements is greater
+than the capacity the last element is removed
 
-// IsRunExecutor is the clear cache item function running?
-func (c *Cache) IsRunExecutor() bool {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.isRunExecutor
+nodeLifeTime: cache item lifetime
+*/
+func NewCache(mu *sync.RWMutex, capacity int, nodeLifeTime time.Duration) *Cache {
+	return &Cache{
+		mu: mu,
+		//head, tail:  nil,
+		//size:  0,
+		capacity: capacity,
+		data:     make(map[string]*node),
+		lifeTime: nodeLifeTime,
+	}
 }
 
 // CacheSize number of items in the cache at the moment
@@ -72,7 +62,13 @@ func (c *Cache) Add(key string, value interface{}) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if _, ok := c.index[key]; ok {
+
+	// delete of the latter when the size is exceeded
+	if c.size >= c.capacity {
+		c.unsafeRemove(c.tail)
+	}
+
+	if _, ok := c.data[key]; ok {
 		return
 	}
 
@@ -85,61 +81,49 @@ func (c *Cache) Add(key string, value interface{}) {
 		c.head = element
 	}
 
-	c.index[key] = element
+	c.data[key] = element
 	c.size++
 }
 
 // Get get from cache by key
 func (c *Cache) Get(key string) (interface{}, bool) {
 	c.mu.RLock()
-	val, ok := c.index[key]
+	node, ok := c.data[key]
 	c.mu.RUnlock()
+
 	if !ok {
 		return nil, false
 	}
-	return val.value, true
-}
-
-func (c *Cache) cacheExecutor() {
-	c.mu.RLock()
-	cacheSize := c.size
-	tailElement := c.tail
-	lifeTime := c.lifeTime
-	c.mu.RUnlock()
-
-	if cacheSize > 0 {
-		if time.Since(tailElement.time) > lifeTime {
-			c.mu.Lock()
-			defer c.mu.Unlock()
-
-			delete(c.index, c.tail.key)
-			c.size--
-			if c.size == 0 {
-				c.head = nil
-				c.tail = nil
-				return
-			}
-			c.tail = c.tail.next
-			c.tail.previous = nil
-		}
-	}
-}
-
-// StartCacheExecutor launch the function to clear cache items
-func (c *Cache) StartCacheExecutor() error {
-	isRun := c.IsRunExecutor()
-	if isRun {
-		return fmt.Errorf("cache executor is already running")
-	}
 
 	c.mu.Lock()
-	c.isRunExecutor = true
-	c.mu.Unlock()
+	defer c.mu.Unlock()
+	if time.Since(node.time) > c.lifeTime {
+		c.unsafeRemove(node)
+		delete(c.data, key)
+		return nil, false
+	}
 
-	go func() {
-		for {
-			c.cacheExecutor()
-		}
-	}()
-	return nil
+	return node.value, true
+}
+
+// unsafeRemove thread-unsafe removal of an element from a linked-list
+func (c *Cache) unsafeRemove(node *node) {
+	if node.next != nil && node.previous != nil {
+		node.previous.next = node.next
+		node.next.previous = node.previous
+		delete(c.data, node.key)
+	} else if node.previous == nil && node.next != nil {
+		c.tail = node.next
+		node.next.previous = nil
+		delete(c.data, node.key)
+	} else if node.next == nil && node.previous != nil {
+		c.head = node.previous
+		node.previous.next = nil
+		delete(c.data, node.key)
+	} else {
+		delete(c.data, node.key)
+		c.head = nil
+		c.tail = nil
+	}
+	c.size--
 }
