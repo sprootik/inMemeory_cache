@@ -139,9 +139,6 @@ func (c *Cache) unsafeRemove(node *node) {
 		delete(c.data, node.key)
 		c.head = nil
 		c.tail = nil
-		if c.size == 1 {
-			clear(c.data)
-		}
 	}
 	c.size--
 }

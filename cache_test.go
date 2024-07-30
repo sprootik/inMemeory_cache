@@ -19,6 +19,7 @@ func printCacheElement() {
 	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
 
 	fmt.Println("----------")
+	fmt.Printf("data: %p %+v\n", cache.data, cache.data)
 	for _, v := range cache.data {
 		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
 	}
