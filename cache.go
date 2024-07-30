@@ -56,6 +56,20 @@ func (c *Cache) CacheSize() int {
 	return c.size
 }
 
+// CacheCapacity current cache capacity
+func (c *Cache) CacheCapacity() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.capacity
+}
+
+// SetCapacity set cache capacity
+func (c *Cache) SetCapacity(capacity int) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.capacity = capacity
+}
+
 // Add add the element in cache
 func (c *Cache) Add(key string, value interface{}) {
 	start := time.Now()
