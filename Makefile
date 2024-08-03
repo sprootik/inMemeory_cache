@@ -5,6 +5,10 @@ testCacheCPU:
 	go test -count=1 -run ^TestCache$$ -cpuprofile tests/cpu.out
 	go tool pprof -http=:8080 tests/cpu.out
 
+testCacheMEM:
+	go test -count=1 -run ^TestCache$$ -memprofile tests/mem.out
+	go tool pprof -http=:8080 tests/mem.out
+
 testCacheMutex:
 	go test -count=1 -run ^TestCache$$ --mutexprofile tests/mutex.out
 	go tool pprof -http=:8080 tests/mutex.out

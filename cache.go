@@ -14,7 +14,7 @@ import (
 // node linked list cache element
 type node struct {
 	key      string
-	value    interface{}
+	value    any
 	time     time.Time
 	next     *node
 	previous *node
@@ -44,7 +44,7 @@ func NewCache(mu *sync.RWMutex, capacity int, nodeLifeTime time.Duration) *Cache
 		//head, tail:  nil,
 		//size:  0,
 		capacity: capacity,
-		data:     make(map[string]*node),
+		data:     make(map[string]*node, capacity),
 		lifeTime: nodeLifeTime,
 	}
 }
@@ -71,7 +71,7 @@ func (c *Cache) SetCapacity(capacity int) {
 }
 
 // Add add the element in cache
-func (c *Cache) Add(key string, value interface{}) {
+func (c *Cache) Add(key string, value any) {
 	start := time.Now()
 	element := &node{key: key, value: value, time: start}
 
@@ -101,7 +101,7 @@ func (c *Cache) Add(key string, value interface{}) {
 }
 
 // Get get from cache by key
-func (c *Cache) Get(key string) (interface{}, bool) {
+func (c *Cache) Get(key string) (any, bool) {
 	c.mu.RLock()
 	node, ok := c.data[key]
 	c.mu.RUnlock()

@@ -63,12 +63,25 @@ func TestCacheCorrectWork(t *testing.T) {
 
 func TestCache(t *testing.T) {
 	var wg sync.WaitGroup
+	//add & get
 	for i := 0; i < 100000; i++ {
 		wg.Add(1)
 		go func() {
-			key := fmt.Sprintf("key-%d", i)
-			value := fmt.Sprintf("value-%d", i)
+			key := strconv.Itoa(i)
+			value := "value-" + key
 			cache.Add(key, value)
+			cache.Get(key)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	time.Sleep(1 * time.Second)
+
+	//get & del
+	for i := 0; i < 100000; i++ {
+		wg.Add(1)
+		go func() {
+			key := strconv.Itoa(i)
 			cache.Get(key)
 			wg.Done()
 		}()
