@@ -83,8 +83,13 @@ func (c *Cache) Add(key string, value any) {
 		c.unsafeRemove(c.tail)
 	}
 
-	if _, ok := c.data[key]; ok {
-		return
+	// delete expired element
+	if cEl, ok := c.data[key]; ok {
+		if time.Since(cEl.time) <= c.lifeTime {
+			return
+		} else {
+			c.unsafeRemove(cEl)
+		}
 	}
 
 	if c.head == nil && c.tail == nil {

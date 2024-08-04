@@ -37,7 +37,7 @@ func TestCacheCorrectWork(t *testing.T) {
 			key := fmt.Sprintf("key-%d", i)
 			value := fmt.Sprintf("value-%d", i)
 			cache.Add(key, value)
-			fmt.Printf("add Node: k:%s v:%s\n", key, value)
+			fmt.Printf("*add Node: k:%s v:%s\n", key, value)
 		}()
 	}
 
@@ -45,7 +45,7 @@ func TestCacheCorrectWork(t *testing.T) {
 	printCacheElement()
 
 	for i := 0; i < 2; i++ {
-		fmt.Printf("iteration: %d\n", i)
+		fmt.Printf("*get iteration, second: %d\n", i)
 		element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
 		fmt.Println("**********")
 		if ok {
@@ -60,6 +60,13 @@ func TestCacheCorrectWork(t *testing.T) {
 		printCacheElement()
 		time.Sleep(1 * time.Second)
 	}
+
+	key := fmt.Sprintf("key-%d", 2)
+	value := fmt.Sprintf("value-%d", 2)
+	cache.Add(key, value)
+	fmt.Printf("*add Node after Get: k:%s v:%s\n", key, value)
+	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	printCacheElement()
 }
 
 func TestCache(t *testing.T) {
