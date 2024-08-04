@@ -103,7 +103,7 @@ func (c *Cache) Add(key string, value any) {
 // Get get from cache by key
 func (c *Cache) Get(key string) (any, bool) {
 	c.mu.RLock()
-	node, ok := c.data[key]
+	element, ok := c.data[key]
 	c.mu.RUnlock()
 
 	if !ok {
@@ -112,13 +112,12 @@ func (c *Cache) Get(key string) (any, bool) {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if time.Since(node.time) > c.lifeTime {
-		c.unsafeRemove(node)
-		delete(c.data, key)
+	if time.Since(element.time) > c.lifeTime {
+		c.unsafeRemove(element)
 		return nil, false
 	}
 
-	return node.value, true
+	return element.value, true
 }
 
 // unsafeRemove thread-unsafe removal of an element from a linked-list

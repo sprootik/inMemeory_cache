@@ -18,8 +18,4 @@ testCacheTrace:
 	go tool trace tests/trace.out
 
 testCacheBench:
-	@echo "=== CPU bench ==="
-	@go test -v -bench=. -run ^BenchmarkCache$$ .
-	@echo "=================="
-	@echo "=== MEM bench ==="
-	@go test -benchmem -run=^$$ -bench ^BenchmarkCache$$ .
+	@go test -benchmem -count=5 -run=^$$ -bench ^BenchmarkCache$$ .

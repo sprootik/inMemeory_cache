@@ -45,6 +45,7 @@ func TestCacheCorrectWork(t *testing.T) {
 	printCacheElement()
 
 	for i := 0; i < 2; i++ {
+		fmt.Printf("iteration: %d\n", i)
 		element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
 		fmt.Println("**********")
 		if ok {
@@ -68,7 +69,7 @@ func TestCache(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			key := strconv.Itoa(i)
-			value := "value-" + key
+			value := fmt.Sprintf("value-%d", i)
 			cache.Add(key, value)
 			cache.Get(key)
 			wg.Done()
@@ -93,16 +94,31 @@ func TestCache(t *testing.T) {
 
 func BenchmarkCache(b *testing.B) {
 	var wg sync.WaitGroup
-	b.StartTimer()
-	for j := 0; j < b.N; j++ {
-		wg.Add(1)
-		go func() {
-			key := strconv.Itoa(j)
-			cache.Add(key, "value")
-			cache.Get(key)
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	b.StopTimer()
+
+	b.ResetTimer()
+	b.Run("Add element in cache", func(b *testing.B) {
+
+		for j := 0; j < b.N; j++ {
+			wg.Add(1)
+			go func() {
+				key := strconv.Itoa(j)
+				cache.Add(key, "value")
+				wg.Done()
+			}()
+		}
+		wg.Wait()
+	})
+
+	b.Run("Get element from cache", func(b *testing.B) {
+
+		for j := 0; j < b.N; j++ {
+			wg.Add(1)
+			go func() {
+				key := strconv.Itoa(j)
+				cache.Get(key)
+				wg.Done()
+			}()
+		}
+		wg.Wait()
+	})
 }
