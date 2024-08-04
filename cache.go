@@ -27,7 +27,7 @@ type Cache struct {
 	head     *node
 	tail     *node
 	data     map[string]*node
-	mu       sync.RWMutex
+	mu       sync.Mutex
 	lifeTime time.Duration
 }
 
@@ -50,15 +50,15 @@ func NewCache(capacity int, nodeLifeTime time.Duration) *Cache {
 
 // CacheSize number of items in the cache at the moment
 func (c *Cache) CacheSize() int {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	return c.size
 }
 
 // CacheCapacity current cache capacity
 func (c *Cache) CacheCapacity() int {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	return c.capacity
 }
 
@@ -106,9 +106,9 @@ func (c *Cache) Add(key string, value any) {
 
 // Get get from cache by key
 func (c *Cache) Get(key string) (any, bool) {
-	c.mu.RLock()
+	c.mu.Lock()
 	element, ok := c.data[key]
-	c.mu.RUnlock()
+	c.mu.Unlock()
 
 	if !ok {
 		return nil, false

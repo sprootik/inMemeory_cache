@@ -15,7 +15,7 @@ func init() {
 }
 
 func printCacheElement() {
-	cache.mu.RLock()
+	cache.mu.Lock()
 	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
 
 	fmt.Println("----------")
@@ -23,7 +23,7 @@ func printCacheElement() {
 	for _, v := range cache.data {
 		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
 	}
-	cache.mu.RUnlock()
+	cache.mu.Unlock()
 	fmt.Println("----------")
 }
 
