@@ -27,7 +27,7 @@ type Cache struct {
 	head     *node
 	tail     *node
 	data     map[string]*node
-	mu       *sync.RWMutex
+	mu       sync.RWMutex
 	lifeTime time.Duration
 }
 
@@ -38,9 +38,8 @@ NewCache init new cache.
 
 	nodeLifeTime: cache item lifetime
 */
-func NewCache(mu *sync.RWMutex, capacity int, nodeLifeTime time.Duration) *Cache {
+func NewCache(capacity int, nodeLifeTime time.Duration) *Cache {
 	return &Cache{
-		mu: mu,
 		//head, tail:  nil,
 		//size:  0,
 		capacity: capacity,
@@ -72,11 +71,9 @@ func (c *Cache) SetCapacity(capacity int) {
 
 // Add add the element in cache
 func (c *Cache) Add(key string, value any) {
-	start := time.Now()
-	element := &node{key: key, value: value, time: start}
+	element := &node{key: key, value: value, time: time.Now()}
 
 	c.mu.Lock()
-	defer c.mu.Unlock()
 
 	// delete of the latter when the size is exceeded
 	if c.size >= c.capacity {
@@ -86,6 +83,7 @@ func (c *Cache) Add(key string, value any) {
 	// delete expired element
 	if cEl, ok := c.data[key]; ok {
 		if time.Since(cEl.time) <= c.lifeTime {
+			c.mu.Unlock()
 			return
 		} else {
 			c.unsafeRemove(cEl)
@@ -103,6 +101,7 @@ func (c *Cache) Add(key string, value any) {
 
 	c.data[key] = element
 	c.size++
+	c.mu.Unlock()
 }
 
 // Get get from cache by key
@@ -116,12 +115,13 @@ func (c *Cache) Get(key string) (any, bool) {
 	}
 
 	c.mu.Lock()
-	defer c.mu.Unlock()
 	if time.Since(element.time) > c.lifeTime {
 		c.unsafeRemove(element)
+		c.mu.Unlock()
 		return nil, false
 	}
 
+	c.mu.Unlock()
 	return element.value, true
 }
 

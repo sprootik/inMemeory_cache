@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// initiate a new cache with an item lifetime of 1 seconds
-	c := cache.NewCache(&sync.RWMutex{}, 1000, 1*time.Second)
+	c := cache.NewCache(1000, 1*time.Second)
 
 	// add 1001 elements in cache.
 	// The cache will only have the last 1000 elements since the capacity is 1000
