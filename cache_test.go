@@ -11,11 +11,11 @@ import (
 var cache *Cache
 
 func init() {
-	cache = NewCache(&sync.RWMutex{}, 1000, 1*time.Second)
+	cache = NewCache(1000, 1*time.Second)
 }
 
 func printCacheElement() {
-	cache.mu.RLock()
+	cache.mu.Lock()
 	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
 
 	fmt.Println("----------")
@@ -23,7 +23,7 @@ func printCacheElement() {
 	for _, v := range cache.data {
 		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
 	}
-	cache.mu.RUnlock()
+	cache.mu.Unlock()
 	fmt.Println("----------")
 }
 
@@ -100,32 +100,22 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	var wg sync.WaitGroup
-
 	b.ResetTimer()
 	b.Run("Add element in cache", func(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
-			wg.Add(1)
-			go func() {
-				key := strconv.Itoa(j)
-				cache.Add(key, "value")
-				wg.Done()
+			func() {
+				cache.Add(strconv.Itoa(j), "value")
 			}()
 		}
-		wg.Wait()
 	})
 
 	b.Run("Get element from cache", func(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
-			wg.Add(1)
-			go func() {
-				key := strconv.Itoa(j)
-				cache.Get(key)
-				wg.Done()
+			func() {
+				cache.Get(strconv.Itoa(j))
 			}()
 		}
-		wg.Wait()
 	})
 }
