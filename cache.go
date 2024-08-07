@@ -107,14 +107,14 @@ func (c *Cache) Add(key string, value any) {
 // Get get from cache by key
 func (c *Cache) Get(key string) (any, bool) {
 	c.mu.Lock()
+
 	element, ok := c.data[key]
-	c.mu.Unlock()
 
 	if !ok {
+		c.mu.Unlock()
 		return nil, false
 	}
 
-	c.mu.Lock()
 	if time.Since(element.time) > c.lifeTime {
 		c.unsafeRemove(element)
 		c.mu.Unlock()
