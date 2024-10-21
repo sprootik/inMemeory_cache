@@ -22,7 +22,6 @@ type node struct {
 
 // Cache cache structure
 type Cache struct {
-	size     int
 	capacity int
 	head     *node
 	tail     *node
@@ -40,8 +39,6 @@ NewCache init new cache.
 */
 func NewCache(capacity int, nodeLifeTime time.Duration) *Cache {
 	return &Cache{
-		//head, tail:  nil,
-		//size:  0,
 		capacity: capacity,
 		data:     make(map[string]*node, capacity),
 		lifeTime: nodeLifeTime,
@@ -52,7 +49,7 @@ func NewCache(capacity int, nodeLifeTime time.Duration) *Cache {
 func (c *Cache) CacheSize() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.size
+	return len(c.data)
 }
 
 // CacheCapacity current cache capacity
@@ -76,7 +73,7 @@ func (c *Cache) Add(key string, value any) {
 	c.mu.Lock()
 
 	// delete of the latter when the size is exceeded
-	if c.size >= c.capacity {
+	if len(c.data) >= c.capacity {
 		c.unsafeRemove(c.tail)
 	}
 
@@ -100,7 +97,6 @@ func (c *Cache) Add(key string, value any) {
 	}
 
 	c.data[key] = element
-	c.size++
 	c.mu.Unlock()
 }
 
@@ -144,5 +140,4 @@ func (c *Cache) unsafeRemove(node *node) {
 		c.head = nil
 		c.tail = nil
 	}
-	c.size--
 }
