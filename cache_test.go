@@ -62,7 +62,7 @@ func BenchmarkCache(b *testing.B) {
 			}()
 		}
 	})
-	
+
 	b.StopTimer()
 	time.Sleep(time.Second)
 	b.StartTimer()
@@ -96,9 +96,18 @@ func printCache(cache *Cache[int, int], caseNum int) {
 func TestCorrectWork(t *testing.T) {
 	cache := NewCache[int, int](3, 1*time.Second)
 
-	cache.Add(0, 0)
-	cache.Add(1, 1)
-	cache.Add(2, 2)
+	ok := cache.Add(0, 0)
+	if !ok {
+		t.Fatal("0 case")
+	}
+	ok = cache.Add(1, 1)
+	if !ok {
+		t.Fatal("0 case")
+	}
+	ok = cache.Add(2, 2)
+	if !ok {
+		t.Fatal("0 case")
+	}
 	printCache(cache, 0)
 	if cache.CacheSize() != 3 {
 		t.Fatal("0 case")
@@ -110,7 +119,10 @@ func TestCorrectWork(t *testing.T) {
 		t.Fatal("1 case")
 	}
 
-	cache.Add(3, 3)
+	ok = cache.Add(3, 3)
+	if !ok {
+		t.Fatal("2 case")
+	}
 	v, ok = cache.Get(1)
 	printCache(cache, 2)
 	if ok || v == 1 {
@@ -130,10 +142,39 @@ func TestCorrectWork(t *testing.T) {
 		t.Fatal("4 case")
 	}
 
-	cache.Add(3, 33)
+	ok = cache.Add(3, 33)
+	if ok {
+		t.Fatal("5 case")
+	}
+	printCache(cache, 5)
 	v, ok = cache.Get(3)
 	if !ok || v != 33 {
 		t.Fatal("5 case")
 	}
-	printCache(cache, 5)
+
+	ok = cache.Add(2, 22)
+	if !ok || cache.tail.value != 22 {
+		t.Fatal("6 case")
+	}
+	time.Sleep(time.Second)
+	ok = cache.Add(3, 333)
+	printCache(cache, 6)
+	if ok || cache.tail.value != 333 {
+		t.Fatal("6 case")
+	}
+
+	time.Sleep(time.Second)
+	v, ok = cache.Get(2)
+	if cache.CacheSize() != 1 || ok || !reflect.ValueOf(v).IsZero() {
+		t.Fatal("7 case")
+	}
+	v, ok = cache.Get(3)
+	if cache.CacheSize() != 0 || ok || !reflect.ValueOf(v).IsZero() {
+		t.Fatal("7 case")
+	}
+	printCache(cache, 7)
+	if cache.tail != nil || cache.head != nil {
+		t.Fatal("7 case")
+	}
+
 }

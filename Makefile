@@ -19,3 +19,6 @@ pprofCacheTrace:
 
 testCacheBench:
 	@go test -benchmem -count=5 -run=^$$ -bench ^BenchmarkCache$$ .
+
+testCacheCorrect:
+	go test -count=1 -run ^TestCorrectWork$$ -v .

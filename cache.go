@@ -47,8 +47,8 @@ func (c *Cache[K, V]) unsafeAddToTail(node *node[K, V]) {
 func (c *Cache[K, V]) unsafeDelete(node *node[K, V]) {
 	// [] - [x] - []
 	if node.next != nil && node.previous != nil {
-		node.previous.next = node.previous
-		node.next.previous = node.next
+		node.previous.next = node.next
+		node.next.previous = node.previous
 		// [x] - [] - []
 	} else if node.previous == nil && node.next != nil {
 		c.head = node.next
@@ -77,9 +77,10 @@ func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 		c.tail.next = node
 		node.previous = c.tail
 		node.next = nil
-		// [x] - []
+		// [x] - [] - []
 	} else if node.previous == nil && node.next != nil {
 		c.head = node.next
+		// node.
 		node.next.previous = nil
 		node.next = nil
 		node.previous = c.tail
@@ -118,7 +119,7 @@ func (c *Cache[K, V]) CacheCapacity() int {
 
 // Add add the element in cache. will return true if a new element was added.
 // If an element was updated or the timeout has expired, returns false.
-func (c *Cache[K, V]) Add(key K, value V) bool {
+func (c *Cache[K, V]) Add(key K, value V) (isNew bool) {
 	element := &node[K, V]{key: key, value: value, time: time.Now()}
 
 	c.mu.Lock()
@@ -136,14 +137,16 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 			cEl.value = value
 			cEl.time = element.time
 			c.unsafeMoveToTail(cEl)
-			return false
+			return
 		} else {
 			c.unsafeDelete(cEl)
 		}
+	} else {
+		isNew = true
 	}
 
 	c.unsafeAddToTail(element)
-	return true
+	return
 }
 
 // Get get from cache by key. Return true if value in cache
