@@ -30,6 +30,7 @@ type Cache struct {
 	lifeTime time.Duration
 }
 
+// unsafeAddToTail thread-unsafe add element to end of linked-list
 func (c *Cache) unsafeAddToTail(node *node) {
 	if c.head == nil && c.tail == nil {
 		c.head = node
@@ -44,12 +45,15 @@ func (c *Cache) unsafeAddToTail(node *node) {
 
 // unsafeDelete thread-unsafe removal of an element from a linked-list
 func (c *Cache) unsafeDelete(node *node) {
+	// [] - [x] - []
 	if node.next != nil && node.previous != nil {
 		node.previous.next = node.previous
 		node.next.previous = node.next
+	// [x] - [] - []
 	} else if node.previous == nil && node.next != nil {
 		c.head = node.next
 		node.next.previous = nil
+	// [] - [] - [x]
 	} else if node.next == nil && node.previous != nil {
 		c.tail = node.previous
 		node.previous.next = nil
@@ -60,6 +64,7 @@ func (c *Cache) unsafeDelete(node *node) {
 	delete(c.data, node.key)
 }
 
+// unsafeMoveToTail thread-unsafely move element to end of linked list
 func (c *Cache) unsafeMoveToTail(node *node) {
 	// [] - [] - [x]
 	if node == c.tail {
@@ -129,6 +134,8 @@ func (c *Cache) Add(key string, value any) bool {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	// TODO: if key exist, update node
 
 	// delete of the latter when the size is exceeded
 	if len(c.data) >= c.capacity {
