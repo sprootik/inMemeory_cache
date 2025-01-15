@@ -45,7 +45,7 @@ func TestCache(t *testing.T) {
 func BenchmarkCache(b *testing.B) {
 	cache := NewCache[int, struct{}](1000, 1*time.Second)
 	b.ResetTimer()
-	b.Run("Add element in cache", func(b *testing.B) {
+	b.Run("Add element", func(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
 			func() {
@@ -54,13 +54,26 @@ func BenchmarkCache(b *testing.B) {
 		}
 	})
 
-	b.Run("Get element from cache", func(b *testing.B) {
+	b.Run("Get element", func(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
 			func() {
 				cache.Get(j)
 			}()
 		}
+	})
+	
+	b.StopTimer()
+	time.Sleep(time.Second)
+	b.StartTimer()
+	b.Run("Get element with timeout", func(b *testing.B) {
+
+		for j := 0; j < b.N; j++ {
+			func() {
+				cache.Get(j)
+			}()
+		}
+
 	})
 }
 

@@ -158,13 +158,14 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 	if !ok {
 		return zeroVal, false
 	}
-	if ok {
-		c.unsafeMoveToTail(node)
-	}
 
 	if time.Since(node.time) > c.lifeTime {
 		c.unsafeDelete(node)
 		return zeroVal, false
+	}
+
+	if ok {
+		c.unsafeMoveToTail(node)
 	}
 	return node.value, true
 }
