@@ -80,7 +80,6 @@ func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 		// [x] - [] - []
 	} else if node.previous == nil && node.next != nil {
 		c.head = node.next
-		// node.
 		node.next.previous = nil
 		node.next = nil
 		node.previous = c.tail
