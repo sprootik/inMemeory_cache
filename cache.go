@@ -90,7 +90,7 @@ func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 }
 
 /*
-NewCache init new cache.
+NewCache init new cache. Key must be comparable
 
 	capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
 

@@ -42,12 +42,13 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
+	cache := NewCache[int, struct{}](1000, 1*time.Second)
 	b.ResetTimer()
 	b.Run("Add element in cache", func(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
 			func() {
-				cache.Add(j, j)
+				cache.Add(j, struct{}{})
 			}()
 		}
 	})
@@ -108,4 +109,17 @@ func TestCorrectWork(t *testing.T) {
 	if cache.CacheSize() != 2 || ok || v != nil {
 		t.Fatal("3 case")
 	}
+
+	cache.Get(2)
+	printCache(cache, 4)
+	if cache.head != cache.tail {
+		t.Fatal("4 case")
+	}
+
+	cache.Add(3, 33)
+	v, ok = cache.Get(3)
+	if !ok || v != 33 {
+		t.Fatal("5 case")
+	}
+	printCache(cache, 5)
 }
