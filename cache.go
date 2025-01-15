@@ -125,17 +125,13 @@ func (c *Cache[K, V]) SetCapacity(capacity int) {
 	c.capacity = capacity
 }
 
-// Add add the element in cache. will return true if a new element was added or an element
-// was updated and the timeout has expired. If an item with the specified key is in the cache and the timeout
-// has not expired, returns false.
-// TODO: add generics
+// Add add the element in cache. will return true if a new element was added.
+// If an element was updated or the timeout has expired, returns false.
 func (c *Cache[K, V]) Add(key K, value V) bool {
 	element := &node[K, V]{key: key, value: value, time: time.Now()}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
-
-	// TODO: if key exist, update node
 
 	// delete of the latter when the size is exceeded
 	if len(c.data) >= c.capacity {
@@ -145,6 +141,10 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 	// delete expired element
 	if cEl, ok := c.data[key]; ok {
 		if time.Since(cEl.time) <= c.lifeTime {
+			// if key exist, update node value
+			cEl.value = value
+			cEl.time = element.time
+			c.unsafeMoveToTail(cEl)
 			return false
 		} else {
 			c.unsafeDelete(cEl)
