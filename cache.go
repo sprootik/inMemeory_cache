@@ -43,7 +43,21 @@ func (c *Cache) unsafeAddToTail(node *node) {
 }
 
 func (c *Cache) unsafeDelete(node *node) {
-	panic("implement")
+	//[] - [x]
+	if node.next != nil && node.previous != nil {
+		node.previous.next = node.previous
+		node.next.previous = node.next
+	} else if node.previous == nil && node.next != nil {
+		c.head = node.next
+		node.next.previous = nil
+	} else if node.next == nil && node.previous != nil {
+		c.tail = node.previous
+		node.previous.next = nil
+	} else {
+		c.head = nil
+		c.tail = nil
+	}
+	delete(c.data, node.key)
 }
 
 func (c *Cache) unsafeMoveToTail(node *node) {
@@ -89,6 +103,7 @@ func (c *Cache) SetCapacity(capacity int) {
 // Add add the element in cache. will return true if a new element was added or an element
 // was updated and the timeout has expired. If an item with the specified key is in the cache and the timeout
 // has not expired, returns false.
+// TODO: add generics
 func (c *Cache) Add(key string, value any) bool {
 	element := &node{key: key, value: value, time: time.Now()}
 
@@ -96,7 +111,7 @@ func (c *Cache) Add(key string, value any) bool {
 
 	// delete of the latter when the size is exceeded
 	if len(c.data) >= c.capacity {
-		c.unsafeRemove(c.tail)
+		c.unsafeDelete(c.head)
 	}
 
 	// delete expired element
@@ -105,7 +120,7 @@ func (c *Cache) Add(key string, value any) bool {
 			c.mu.Unlock()
 			return false
 		} else {
-			c.unsafeRemove(cEl)
+			c.unsafeDelete(cEl)
 		}
 	}
 
