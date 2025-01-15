@@ -135,13 +135,16 @@ func printCache() {
 	fmt.Println("=======")
 }
 func TestWork(t *testing.T) {
-	printCache()
 	cache.SetCapacity(3)
-	cache.Add("0", 0)
 	printCache()
+	cache.Add("0", 0)
 	cache.Add("1", 1)
 	cache.Add("2", 2)
-	printCache()
 	cache.Add("3", 3)
+	printCache()
+	cache.Get("1")
+	printCache()
+	printCache()
+	cache.Get("3")
 	printCache()
 }

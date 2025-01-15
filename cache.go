@@ -42,8 +42,8 @@ func (c *Cache) unsafeAddToTail(node *node) {
 	c.data[node.key] = node
 }
 
+// unsafeDelete thread-unsafe removal of an element from a linked-list
 func (c *Cache) unsafeDelete(node *node) {
-	//[] - [x]
 	if node.next != nil && node.previous != nil {
 		node.previous.next = node.previous
 		node.next.previous = node.next
@@ -61,7 +61,27 @@ func (c *Cache) unsafeDelete(node *node) {
 }
 
 func (c *Cache) unsafeMoveToTail(node *node) {
-	panic("implement")
+	// [] - [] - [x]
+	if node == c.tail {
+		return
+	}
+	// [] - [x] - []
+	if node.next != nil && node.previous != nil  {
+		node.previous.next = node.next
+		node.next.previous = node.previous
+		c.tail.next = node
+		node.previous = c.tail
+		node.next = nil
+	// [x] - []
+	} else if node.previous == nil && node.next != nil {
+		c.head = node.next
+		node.next.previous = nil
+		node.next = nil
+		node.previous = c.tail
+		c.tail.next = node
+
+	}
+	c.tail = node
 }
 
 /*
@@ -131,41 +151,22 @@ func (c *Cache) Add(key string, value any) bool {
 // Get get from cache by key
 func (c *Cache) Get(key string) (any, bool) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	element, ok := c.data[key]
+	node, ok := c.data[key]
 
 	if !ok {
-		c.mu.Unlock()
 		return nil, false
 	}
+	if ok {
+		c.unsafeMoveToTail(node)
+	}
 
-	if time.Since(element.time) > c.lifeTime {
-		c.unsafeRemove(element)
-		c.mu.Unlock()
+	if time.Since(node.time) > c.lifeTime {
+		c.unsafeDelete(node)
 		return nil, false
 	}
-
-	c.mu.Unlock()
-	return element.value, true
+	return node.value, true
 }
 
-// unsafeRemove thread-unsafe removal of an element from a linked-list
-func (c *Cache) unsafeRemove(node *node) {
-	if node.next != nil && node.previous != nil {
-		node.previous.next = node.next
-		node.next.previous = node.previous
-		delete(c.data, node.key)
-	} else if node.previous == nil && node.next != nil {
-		c.tail = node.next
-		node.next.previous = nil
-		delete(c.data, node.key)
-	} else if node.next == nil && node.previous != nil {
-		c.head = node.previous
-		node.previous.next = nil
-		delete(c.data, node.key)
-	} else {
-		delete(c.data, node.key)
-		c.head = nil
-		c.tail = nil
-	}
-}
+
