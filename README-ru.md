@@ -17,14 +17,14 @@ goos: linux
 goarch: amd64
 pkg: github.com/sprootik/inMemeory_cache
 cpu: AMD Ryzen 7 6800H with Radeon Graphics         
-BenchmarkCache/Add_element_in_cache-16           6152816               195.5 ns/op            89 B/op          2 allocs/op
-BenchmarkCache/Add_element_in_cache-16           6090147               196.3 ns/op            89 B/op          2 allocs/op
-BenchmarkCache/Add_element_in_cache-16           6015614               196.1 ns/op            89 B/op          2 allocs/op
-BenchmarkCache/Add_element_in_cache-16           6138055               196.4 ns/op            89 B/op          2 allocs/op
-BenchmarkCache/Add_element_in_cache-16           6079730               197.4 ns/op            89 B/op          2 allocs/op
-BenchmarkCache/Get_element_from_cache-16        29385784                44.97 ns/op            7 B/op          0 allocs/op
-BenchmarkCache/Get_element_from_cache-16        45410721                26.71 ns/op            7 B/op          0 allocs/op
-BenchmarkCache/Get_element_from_cache-16        44493037                26.47 ns/op            7 B/op          0 allocs/op
-BenchmarkCache/Get_element_from_cache-16        45292598                30.81 ns/op            7 B/op          0 allocs/op
-BenchmarkCache/Get_element_from_cache-16        43584282                26.34 ns/op            7 B/op          0 allocs/op
+BenchmarkCache/Add_element_in_cache-16           7344130               148.6 ns/op            64 B/op          1 allocs/op
+BenchmarkCache/Add_element_in_cache-16           7923462               158.2 ns/op            64 B/op          1 allocs/op
+BenchmarkCache/Add_element_in_cache-16           7925038               160.9 ns/op            64 B/op          1 allocs/op
+BenchmarkCache/Add_element_in_cache-16           5910595               199.9 ns/op            64 B/op          1 allocs/op
+BenchmarkCache/Add_element_in_cache-16           5963118               198.9 ns/op            64 B/op          1 allocs/op
+BenchmarkCache/Get_element_from_cache-16        51909685                22.24 ns/op            0 B/op          0 allocs/op
+BenchmarkCache/Get_element_from_cache-16        155644192                7.635 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_from_cache-16        161705904                7.400 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_from_cache-16        162728091                7.483 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_from_cache-16        163964517                7.361 ns/op           0 B/op          0 allocs/op
 ```

@@ -113,16 +113,7 @@ func (c *Cache[K, V]) CacheSize() int {
 
 // CacheCapacity current cache capacity
 func (c *Cache[K, V]) CacheCapacity() int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
 	return c.capacity
-}
-
-// SetCapacity set cache capacity
-func (c *Cache[K, V]) SetCapacity(capacity int) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.capacity = capacity
 }
 
 // Add add the element in cache. will return true if a new element was added.

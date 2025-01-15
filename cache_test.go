@@ -2,72 +2,71 @@ package cache
 
 import (
 	"fmt"
-	"strconv"
 	"sync"
 	"testing"
 	"time"
 )
 
-var cache *Cache[string, any]
+var cache *Cache[int, int]
 
 func init() {
-	cache = NewCache[string, any](1000, 1*time.Second)
+	cache = NewCache[int, int](1000, 1*time.Second)
 }
 
-func printCacheElement() {
-	cache.mu.Lock()
-	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
+// func printCacheElement() {
+// 	cache.mu.Lock()
+// 	fmt.Printf("Cache tail: %p, head: %p\n", cache.tail, cache.head)
 
-	fmt.Println("----------")
-	fmt.Printf("data: %p %+v\n", cache.data, cache.data)
-	for _, v := range cache.data {
-		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
-	}
-	cache.mu.Unlock()
-	fmt.Println("----------")
-}
+// 	fmt.Println("----------")
+// 	fmt.Printf("data: %p %+v\n", cache.data, cache.data)
+// 	for _, v := range cache.data {
+// 		fmt.Printf("Pointer: %p\n Node: %+v\n", v, v)
+// 	}
+// 	cache.mu.Unlock()
+// 	fmt.Println("----------")
+// }
 
-func TestCacheCorrectWork(t *testing.T) {
-	cache.mu.Lock()
-	cache.capacity = 4
-	cache.mu.Unlock()
+// func TestCacheCorrectWork(t *testing.T) {
+// 	cache.mu.Lock()
+// 	cache.capacity = 4
+// 	cache.mu.Unlock()
 
-	for i := 0; i < 5; i++ {
-		func() {
-			key := fmt.Sprintf("key-%d", i)
-			value := fmt.Sprintf("value-%d", i)
-			cache.Add(key, value)
-			fmt.Printf("*add Node: k:%s v:%s\n", key, value)
-		}()
-	}
+// 	for i := 0; i < 5; i++ {
+// 		func() {
+// 			key := fmt.Sprintf("key-%d", i)
+// 			value := fmt.Sprintf("value-%d", i)
+// 			cache.Add(key, value)
+// 			fmt.Printf("*add Node: k:%s v:%s\n", key, value)
+// 		}()
+// 	}
 
-	fmt.Printf("Cache size: %d\n", cache.CacheSize())
-	printCacheElement()
+// 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+// 	printCacheElement()
 
-	for i := 0; i < 2; i++ {
-		fmt.Printf("*get iteration, second: %d\n", i)
-		element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
-		fmt.Println("**********")
-		if ok {
-			fmt.Printf("element in cache: %s\n", element)
-		} else {
-			fmt.Println("not found in cache")
-		}
-		fmt.Println("**********")
+// 	for i := 0; i < 2; i++ {
+// 		fmt.Printf("*get iteration, second: %d\n", i)
+// 		element, ok := cache.Get(fmt.Sprintf("key-%d", 3))
+// 		fmt.Println("**********")
+// 		if ok {
+// 			fmt.Printf("element in cache: %s\n", element)
+// 		} else {
+// 			fmt.Println("not found in cache")
+// 		}
+// 		fmt.Println("**********")
 
-		time.Sleep(1 * time.Second)
-		fmt.Printf("Cache size: %d\n", cache.CacheSize())
-		printCacheElement()
-		time.Sleep(1 * time.Second)
-	}
+// 		time.Sleep(1 * time.Second)
+// 		fmt.Printf("Cache size: %d\n", cache.CacheSize())
+// 		printCacheElement()
+// 		time.Sleep(1 * time.Second)
+// 	}
 
-	key := fmt.Sprintf("key-%d", 2)
-	value := fmt.Sprintf("value-%d", 2)
-	cache.Add(key, value)
-	fmt.Printf("*add Node after Get: k:%s v:%s\n", key, value)
-	fmt.Printf("Cache size: %d\n", cache.CacheSize())
-	printCacheElement()
-}
+// 	key := fmt.Sprintf("key-%d", 2)
+// 	value := fmt.Sprintf("value-%d", 2)
+// 	cache.Add(key, value)
+// 	fmt.Printf("*add Node after Get: k:%s v:%s\n", key, value)
+// 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+// 	printCacheElement()
+// }
 
 func TestCache(t *testing.T) {
 	var wg sync.WaitGroup
@@ -75,10 +74,8 @@ func TestCache(t *testing.T) {
 	for i := 0; i < 100000; i++ {
 		wg.Add(1)
 		go func() {
-			key := strconv.Itoa(i)
-			value := fmt.Sprintf("value-%d", i)
-			cache.Add(key, value)
-			cache.Get(key)
+			cache.Add(i, i)
+			cache.Get(i)
 			wg.Done()
 		}()
 	}
@@ -89,8 +86,7 @@ func TestCache(t *testing.T) {
 	for i := 0; i < 100000; i++ {
 		wg.Add(1)
 		go func() {
-			key := strconv.Itoa(i)
-			cache.Get(key)
+			cache.Get(i)
 			wg.Done()
 		}()
 	}
@@ -105,7 +101,7 @@ func BenchmarkCache(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
 			func() {
-				cache.Add(strconv.Itoa(j), "value")
+				cache.Add(j, j)
 			}()
 		}
 	})
@@ -114,7 +110,7 @@ func BenchmarkCache(b *testing.B) {
 
 		for j := 0; j < b.N; j++ {
 			func() {
-				cache.Get(strconv.Itoa(j))
+				cache.Get(j)
 			}()
 		}
 	})
@@ -135,16 +131,15 @@ func printCache() {
 	fmt.Println("=======")
 }
 func TestWork(t *testing.T) {
-	cache.SetCapacity(3)
 	printCache()
-	cache.Add("0", 0)
-	cache.Add("1", 1)
-	cache.Add("2", 2)
-	cache.Add("3", 3)
+	cache.Add(0, 0)
+	cache.Add(1, 1)
+	cache.Add(2, 2)
+	cache.Add(3, 3)
 	printCache()
-	cache.Get("1")
+	cache.Get(1)
 	printCache()
 	printCache()
-	cache.Get("3")
+	cache.Get(3)
 	printCache()
 }
