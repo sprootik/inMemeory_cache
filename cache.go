@@ -30,6 +30,26 @@ type Cache struct {
 	lifeTime time.Duration
 }
 
+func (c *Cache) unsafeAddToTail(node *node) {
+	if c.head == nil && c.tail == nil {
+		c.head = node
+		c.tail = node
+	} else {
+		node.previous = c.tail
+		c.tail.next = node
+		c.tail = node
+	}
+	c.data[node.key] = node
+}
+
+func (c *Cache) unsafeDelete(node *node) {
+	panic("implement")
+}
+
+func (c *Cache) unsafeMoveToTail(node *node) {
+	panic("implement")
+}
+
 /*
 NewCache init new cache.
 
@@ -89,16 +109,7 @@ func (c *Cache) Add(key string, value any) bool {
 		}
 	}
 
-	if c.head == nil && c.tail == nil {
-		c.head = element
-		c.tail = element
-	} else {
-		element.previous = c.head
-		c.head.next = element
-		c.head = element
-	}
-
-	c.data[key] = element
+	c.unsafeAddToTail(element)
 	c.mu.Unlock()
 	return true
 }

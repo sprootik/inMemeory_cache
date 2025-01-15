@@ -119,3 +119,29 @@ func BenchmarkCache(b *testing.B) {
 		}
 	})
 }
+
+func printCache() {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	fmt.Printf("head: %p, tail %p\n", cache.head, cache.tail)
+	h := cache.head // change hed & tail
+	var i int
+	for h != nil {
+		fmt.Printf("%d %p %+v\n", i, h, h)
+		h = h.next
+		i++
+	}
+	fmt.Println("=======")
+}
+func TestWork(t *testing.T) {
+	printCache()
+	cache.SetCapacity(3)
+	cache.Add("0", 0)
+	printCache()
+	cache.Add("1", 1)
+	cache.Add("2", 2)
+	printCache()
+	cache.Add("3", 3)
+	printCache()
+}
