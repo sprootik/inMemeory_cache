@@ -147,14 +147,16 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 }
 
 // Get get from cache by key. Return true if value in cache
-func (c *Cache[K, V]) Get(key K) (any, bool) {
+func (c *Cache[K, V]) Get(key K) (V, bool) {
+	var zeroVal V
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	node, ok := c.data[key]
 
 	if !ok {
-		return nil, false
+		return zeroVal, false
 	}
 	if ok {
 		c.unsafeMoveToTail(node)
@@ -162,7 +164,7 @@ func (c *Cache[K, V]) Get(key K) (any, bool) {
 
 	if time.Since(node.time) > c.lifeTime {
 		c.unsafeDelete(node)
-		return nil, false
+		return zeroVal, false
 	}
 	return node.value, true
 }

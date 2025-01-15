@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -106,7 +107,7 @@ func TestCorrectWork(t *testing.T) {
 	time.Sleep(time.Second)
 	v, ok = cache.Get(0)
 	printCache(cache, 3)
-	if cache.CacheSize() != 2 || ok || v != nil {
+	if cache.CacheSize() != 2 || ok || !reflect.ValueOf(v).IsZero() {
 		t.Fatal("3 case")
 	}
 
