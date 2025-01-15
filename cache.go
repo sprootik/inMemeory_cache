@@ -108,6 +108,7 @@ func (c *Cache) Add(key string, value any) bool {
 	element := &node{key: key, value: value, time: time.Now()}
 
 	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	// delete of the latter when the size is exceeded
 	if len(c.data) >= c.capacity {
@@ -117,7 +118,6 @@ func (c *Cache) Add(key string, value any) bool {
 	// delete expired element
 	if cEl, ok := c.data[key]; ok {
 		if time.Since(cEl.time) <= c.lifeTime {
-			c.mu.Unlock()
 			return false
 		} else {
 			c.unsafeDelete(cEl)
@@ -125,7 +125,6 @@ func (c *Cache) Add(key string, value any) bool {
 	}
 
 	c.unsafeAddToTail(element)
-	c.mu.Unlock()
 	return true
 }
 
