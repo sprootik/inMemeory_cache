@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-var cache *Cache
+var cache *Cache[string, any]
 
 func init() {
-	cache = NewCache(1000, 1*time.Second)
+	cache = NewCache[string, any](1000, 1*time.Second)
 }
 
 func printCacheElement() {

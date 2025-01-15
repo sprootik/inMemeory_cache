@@ -12,26 +12,26 @@ import (
 )
 
 // node linked list cache element
-type node struct {
-	key      string
-	value    any
+type node[K comparable, V any] struct {
+	key      K
+	value    V
 	time     time.Time
-	next     *node
-	previous *node
+	next     *node[K, V]
+	previous *node[K, V]
 }
 
 // Cache cache structure
-type Cache struct {
+type Cache[K comparable, V any] struct {
 	capacity int
-	head     *node
-	tail     *node
-	data     map[string]*node
+	head     *node[K, V]
+	tail     *node[K, V]
+	data     map[K]*node[K, V]
 	mu       sync.Mutex
 	lifeTime time.Duration
 }
 
 // unsafeAddToTail thread-unsafe add element to end of linked-list
-func (c *Cache) unsafeAddToTail(node *node) {
+func (c *Cache[K, V]) unsafeAddToTail(node *node[K, V]) {
 	if c.head == nil && c.tail == nil {
 		c.head = node
 		c.tail = node
@@ -44,16 +44,16 @@ func (c *Cache) unsafeAddToTail(node *node) {
 }
 
 // unsafeDelete thread-unsafe removal of an element from a linked-list
-func (c *Cache) unsafeDelete(node *node) {
+func (c *Cache[K, V]) unsafeDelete(node *node[K, V]) {
 	// [] - [x] - []
 	if node.next != nil && node.previous != nil {
 		node.previous.next = node.previous
 		node.next.previous = node.next
-	// [x] - [] - []
+		// [x] - [] - []
 	} else if node.previous == nil && node.next != nil {
 		c.head = node.next
 		node.next.previous = nil
-	// [] - [] - [x]
+		// [] - [] - [x]
 	} else if node.next == nil && node.previous != nil {
 		c.tail = node.previous
 		node.previous.next = nil
@@ -65,19 +65,19 @@ func (c *Cache) unsafeDelete(node *node) {
 }
 
 // unsafeMoveToTail thread-unsafely move element to end of linked list
-func (c *Cache) unsafeMoveToTail(node *node) {
+func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 	// [] - [] - [x]
 	if node == c.tail {
 		return
 	}
 	// [] - [x] - []
-	if node.next != nil && node.previous != nil  {
+	if node.next != nil && node.previous != nil {
 		node.previous.next = node.next
 		node.next.previous = node.previous
 		c.tail.next = node
 		node.previous = c.tail
 		node.next = nil
-	// [x] - []
+		// [x] - []
 	} else if node.previous == nil && node.next != nil {
 		c.head = node.next
 		node.next.previous = nil
@@ -96,30 +96,30 @@ NewCache init new cache.
 
 	nodeLifeTime: cache item lifetime
 */
-func NewCache(capacity int, nodeLifeTime time.Duration) *Cache {
-	return &Cache{
+func NewCache[K comparable, V any](capacity int, nodeLifeTime time.Duration) *Cache[K, V] {
+	return &Cache[K, V]{
 		capacity: capacity,
-		data:     make(map[string]*node, capacity),
+		data:     make(map[K]*node[K, V], capacity),
 		lifeTime: nodeLifeTime,
 	}
 }
 
 // CacheSize number of items in the cache at the moment
-func (c *Cache) CacheSize() int {
+func (c *Cache[K, V]) CacheSize() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return len(c.data)
 }
 
 // CacheCapacity current cache capacity
-func (c *Cache) CacheCapacity() int {
+func (c *Cache[K, V]) CacheCapacity() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.capacity
 }
 
 // SetCapacity set cache capacity
-func (c *Cache) SetCapacity(capacity int) {
+func (c *Cache[K, V]) SetCapacity(capacity int) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.capacity = capacity
@@ -129,8 +129,8 @@ func (c *Cache) SetCapacity(capacity int) {
 // was updated and the timeout has expired. If an item with the specified key is in the cache and the timeout
 // has not expired, returns false.
 // TODO: add generics
-func (c *Cache) Add(key string, value any) bool {
-	element := &node{key: key, value: value, time: time.Now()}
+func (c *Cache[K, V]) Add(key K, value V) bool {
+	element := &node[K, V]{key: key, value: value, time: time.Now()}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -156,7 +156,7 @@ func (c *Cache) Add(key string, value any) bool {
 }
 
 // Get get from cache by key
-func (c *Cache) Get(key string) (any, bool) {
+func (c *Cache[K, V]) Get(key K) (any, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -175,5 +175,3 @@ func (c *Cache) Get(key string) (any, bool) {
 	}
 	return node.value, true
 }
-
-
