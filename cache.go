@@ -146,7 +146,7 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 	return true
 }
 
-// Get get from cache by key
+// Get get from cache by key. Return true if value in cache
 func (c *Cache[K, V]) Get(key K) (any, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
