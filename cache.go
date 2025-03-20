@@ -28,6 +28,7 @@ type Cache[K comparable, V any] struct {
 	data     map[K]*node[K, V]
 	mu       sync.Mutex
 	lifeTime time.Duration
+	zeroVal V
 }
 
 // unsafeAddToTail thread-unsafe add element to end of linked-list
@@ -149,20 +150,18 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 
 // Get get from cache by key. Return true if value in cache
 func (c *Cache[K, V]) Get(key K) (V, bool) {
-	var zeroVal V
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	node, ok := c.data[key]
 
 	if !ok {
-		return zeroVal, false
+		return c.zeroVal, false
 	}
 
 	if time.Since(node.time) > c.lifeTime {
 		c.unsafeDelete(node)
-		return zeroVal, false
+		return c.zeroVal, false
 	}
 
 	if ok {
