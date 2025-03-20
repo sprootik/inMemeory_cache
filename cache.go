@@ -33,15 +33,16 @@ type Cache[K comparable, V any] struct {
 
 // unsafeAddToTail thread-unsafe add element to end of linked-list
 func (c *Cache[K, V]) unsafeAddToTail(node *node[K, V]) {
+	c.data[node.key] = node
+
 	if c.head == nil && c.tail == nil {
 		c.head = node
 		c.tail = node
-	} else {
-		node.previous = c.tail
-		c.tail.next = node
-		c.tail = node
+		return
 	}
-	c.data[node.key] = node
+	node.previous = c.tail
+	c.tail.next = node
+	c.tail = node
 }
 
 // unsafeDelete thread-unsafe removal of an element from a linked-list
