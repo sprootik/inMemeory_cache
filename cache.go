@@ -70,7 +70,6 @@ func (c *Cache[K, V]) unsafeDelete(node *node[K, V]) {
 	// [x]
 	c.head = nil
 	c.tail = nil
-
 }
 
 // unsafeMoveToTail thread-unsafely move element to end of linked list
