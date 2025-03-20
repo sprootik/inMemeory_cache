@@ -15,29 +15,31 @@ func init() {
 }
 
 func TestCache(t *testing.T) {
+	const count = 100000
 	var wg sync.WaitGroup
-	//add & get
-	for i := 0; i < 100000; i++ {
-		wg.Add(1)
-		go func() {
-			cache.Add(i, i)
-			cache.Get(i)
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	time.Sleep(1 * time.Second)
 
-	//get & del
-	for i := 0; i < 100000; i++ {
-		wg.Add(1)
-		go func() {
+	wg.Add(count)
+	go func() {
+		for i := range count {
+			cache.Add(i, i)
+			wg.Done()
+		}
+	}()
+
+	wg.Add(count)
+	go func() {
+		for i := range count {
 			cache.Get(i)
 			cache.CacheCapacity()
+			cache.CacheSize()
 			wg.Done()
-		}()
-	}
+		}
+	}()
 	wg.Wait()
+
+	if cache.CacheSize() != 1000 {
+		t.Fatal("incoorect size")
+	}
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
 }
