@@ -80,23 +80,21 @@ func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 		return
 	}
 
-	defer func() { c.tail = node }()
+	defer func() {
+		c.tail.next = node
+		node.previous = c.tail
+		node.next = nil
+		c.tail = node
+	}()
 	// [] - [x] - []
 	if node.next != nil && node.previous != nil {
 		node.previous.next = node.next
 		node.next.previous = node.previous
-		c.tail.next = node
-		node.previous = c.tail
-		node.next = nil
 		return
 	}
 	// [x] - [] - []
 	c.head = node.next
 	node.next.previous = nil
-	node.next = nil
-	node.previous = c.tail
-	c.tail.next = node
-
 }
 
 /*
