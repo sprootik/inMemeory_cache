@@ -15,10 +15,10 @@ func init() {
 }
 
 func TestCache(t *testing.T) {
-	const count = 100000
+	const count = 10000000
 	var wg sync.WaitGroup
 
-	wg.Add(count)
+	wg.Add(count * 2)
 	go func() {
 		for i := range count {
 			cache.Add(i, i)
@@ -26,7 +26,6 @@ func TestCache(t *testing.T) {
 		}
 	}()
 
-	wg.Add(count)
 	go func() {
 		for i := range count {
 			cache.Get(i)
