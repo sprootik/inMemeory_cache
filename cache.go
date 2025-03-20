@@ -124,11 +124,6 @@ func (c *Cache[K, V]) Add(key K, value V) (isNew bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	// delete of the latter when the size is exceeded
-	if len(c.data) >= c.capacity {
-		c.unsafeDelete(c.head)
-	}
-
 	// delete expired element
 	if cEl, ok := c.data[key]; ok {
 		if time.Since(cEl.time) <= c.lifeTime {
@@ -142,6 +137,11 @@ func (c *Cache[K, V]) Add(key K, value V) (isNew bool) {
 		}
 	} else {
 		isNew = true
+	}
+
+	// delete of the latter when the size is exceeded
+	if len(c.data) >= c.capacity {
+		c.unsafeDelete(c.head)
 	}
 
 	c.unsafeAddToTail(element)
