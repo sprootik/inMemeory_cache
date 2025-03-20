@@ -163,9 +163,7 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 		c.unsafeDelete(node)
 		return c.zeroVal, false
 	}
+	c.unsafeMoveToTail(node)
 
-	if ok {
-		c.unsafeMoveToTail(node)
-	}
 	return node.value, true
 }
