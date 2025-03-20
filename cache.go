@@ -133,10 +133,10 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 	defer c.mu.Unlock()
 
 	// update exist element
-	if cEl, ok := c.data[key]; ok {
-		cEl.value = value
-		cEl.time = start
-		c.unsafeMoveToTail(cEl)
+	if nd, ok := c.data[key]; ok {
+		nd.value = value
+		nd.time = start
+		c.unsafeMoveToTail(nd)
 		return false
 
 	}
