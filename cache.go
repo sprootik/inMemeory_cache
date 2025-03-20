@@ -120,7 +120,7 @@ func (c *Cache[K, V]) CacheCapacity() int {
 // If an element was updated or the timeout has expired, returns false.
 func (c *Cache[K, V]) Add(key K, value V) bool {
 	isNew := true
-	element := &node[K, V]{key: key, value: value, time: time.Now()}
+	start := time.Now()
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -131,7 +131,7 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 		if time.Since(cEl.time) <= c.lifeTime {
 			// if key exist, update node value
 			cEl.value = value
-			cEl.time = element.time
+			cEl.time = start
 			c.unsafeMoveToTail(cEl)
 			return isNew
 		}
@@ -143,7 +143,7 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 		c.unsafeDelete(c.head)
 	}
 
-	c.unsafeAddToTail(element)
+	c.unsafeAddToTail(&node[K, V]{key: key, value: value, time: start})
 	return isNew
 }
 
