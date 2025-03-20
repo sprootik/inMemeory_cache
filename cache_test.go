@@ -15,38 +15,37 @@ func init() {
 }
 
 func TestCache(t *testing.T) {
+	const count = 100000
 	var wg sync.WaitGroup
-	//add & get
-	for i := 0; i < 100000; i++ {
-		wg.Add(1)
-		go func() {
-			cache.Add(i, i)
-			cache.Get(i)
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	time.Sleep(1 * time.Second)
 
-	//get & del
-	for i := 0; i < 100000; i++ {
-		wg.Add(1)
-		go func() {
+	wg.Add(count * 2)
+	go func() {
+		for i := range count {
+			cache.Add(i, i)
+			wg.Done()
+		}
+	}()
+
+	go func() {
+		for i := range count {
 			cache.Get(i)
 			cache.CacheCapacity()
+			cache.CacheSize()
 			wg.Done()
-		}()
-	}
+		}
+	}()
 	wg.Wait()
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	if cache.CacheSize() != 1000 {
+		t.Fatal("cache size")
+	}
 }
 
 func BenchmarkCache(b *testing.B) {
-	cache := NewCache[int, struct{}](1000, 1*time.Second)
+	cache := NewCache[int, struct{}](1000, 30*time.Second)
 	b.ResetTimer()
 	b.Run("Add element", func(b *testing.B) {
-
 		for j := 0; j < b.N; j++ {
 			func() {
 				cache.Add(j, struct{}{})
@@ -55,7 +54,6 @@ func BenchmarkCache(b *testing.B) {
 	})
 
 	b.Run("Get element", func(b *testing.B) {
-
 		for j := 0; j < b.N; j++ {
 			func() {
 				cache.Get(j)
@@ -64,10 +62,9 @@ func BenchmarkCache(b *testing.B) {
 	})
 
 	b.StopTimer()
-	time.Sleep(time.Second)
+	time.Sleep(30 * time.Second)
 	b.StartTimer()
 	b.Run("Get element with timeout", func(b *testing.B) {
-
 		for j := 0; j < b.N; j++ {
 			func() {
 				cache.Get(j)
