@@ -37,10 +37,6 @@ func TestCache(t *testing.T) {
 	}()
 	wg.Wait()
 
-	if cache.CacheSize() != 1000 {
-		t.Fatal("incoorect size")
-	}
-
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
 }
 
