@@ -118,7 +118,7 @@ func (c *Cache[K, V]) CacheCapacity() int {
 }
 
 // Add add the element in cache. will return true if a new element was added.
-// If an element was updated or the timeout has expired, returns false.
+// If an element was updated returns false.
 func (c *Cache[K, V]) Add(key K, value V) bool {
 	start := time.Now()
 
