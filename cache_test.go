@@ -40,7 +40,7 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	cache := NewCache[int, struct{}](1, 30*time.Second)
+	cache := NewCache[int, struct{}](1000, 30*time.Second)
 	b.ResetTimer()
 	b.Run("Add element", func(b *testing.B) {
 		for j := 0; j < b.N; j++ {
