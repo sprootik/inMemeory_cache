@@ -67,6 +67,7 @@ func (c *Cache[K, V]) unsafeDelete(node *node[K, V]) {
 		node.previous.next = nil
 		return
 	}
+	// [x]
 	c.head = nil
 	c.tail = nil
 
