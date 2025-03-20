@@ -47,23 +47,29 @@ func (c *Cache[K, V]) unsafeAddToTail(node *node[K, V]) {
 
 // unsafeDelete thread-unsafe removal of an element from a linked-list
 func (c *Cache[K, V]) unsafeDelete(node *node[K, V]) {
+	delete(c.data, node.key)
+
 	// [] - [x] - []
 	if node.next != nil && node.previous != nil {
 		node.previous.next = node.next
 		node.next.previous = node.previous
-		// [x] - [] - []
-	} else if node.previous == nil && node.next != nil {
+		return
+	}
+	// [x] - [] - []
+	if node.previous == nil && node.next != nil {
 		c.head = node.next
 		node.next.previous = nil
-		// [] - [] - [x]
-	} else if node.next == nil && node.previous != nil {
+		return
+	}
+	// [] - [] - [x]
+	if node.next == nil && node.previous != nil {
 		c.tail = node.previous
 		node.previous.next = nil
-	} else {
-		c.head = nil
-		c.tail = nil
+		return
 	}
-	delete(c.data, node.key)
+	c.head = nil
+	c.tail = nil
+
 }
 
 // unsafeMoveToTail thread-unsafely move element to end of linked list
