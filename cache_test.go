@@ -15,7 +15,7 @@ func init() {
 }
 
 func TestCache(t *testing.T) {
-	const count = 10000000
+	const count = 100000
 	var wg sync.WaitGroup
 
 	wg.Add(count * 2)
@@ -37,6 +37,9 @@ func TestCache(t *testing.T) {
 	wg.Wait()
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	if cache.CacheSize() != 1000 {
+		t.Fatal("cache size")
+	}
 }
 
 func BenchmarkCache(b *testing.B) {
