@@ -131,12 +131,12 @@ func (c *Cache[K, V]) Add(key K, value V) (isNew bool) {
 			cEl.value = value
 			cEl.time = element.time
 			c.unsafeMoveToTail(cEl)
-			return
-		} else {
-			c.unsafeDelete(cEl)
+			return false
 		}
+		c.unsafeDelete(cEl)
+
 	} else {
-		isNew = true
+		isNew = !ok
 	}
 
 	// delete of the latter when the size is exceeded
