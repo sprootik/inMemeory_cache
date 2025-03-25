@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/sprootik/inMemeory_cache"
 	"sync"
 	"time"
+
+	cache "github.com/sprootik/inMemeory_cache"
 )
 
 func main() {
 	// initiate a new cache with an item lifetime of 1 seconds. Key must be comparable
-	c := cache.NewCache[int, string](1000, 1*time.Second)
+	c := cache.NewCache[int, string](1000).WithTimeout(1 * time.Second)
 
 	// add 1001 elements in cache.
 	// The cache will only have the last 1000 elements since the capacity is 1000
