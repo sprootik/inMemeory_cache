@@ -1,6 +1,6 @@
 // Package cache
 /*
-the package implements in-memory LRU cache consisting of elements with life time.
+The package implements an in-memory LRU cache consisting of elements, optionally with a time to live.
 This cache is thread safe.
 Algorithmic complexity of work is O(1).
 */
@@ -22,13 +22,38 @@ type node[K comparable, V any] struct {
 
 // Cache cache structure
 type Cache[K comparable, V any] struct {
-	capacity int
-	head     *node[K, V]
-	tail     *node[K, V]
-	data     map[K]*node[K, V]
-	mu       sync.Mutex
-	lifeTime time.Duration
-	zeroVal  V
+	capacity    int
+	head        *node[K, V]
+	tail        *node[K, V]
+	data        map[K]*node[K, V]
+	mu          sync.Mutex
+	lifeTime    time.Duration
+	withTimeout bool
+	zeroVal     V
+}
+
+/*
+NewCache init new cache. Key must be comparable
+
+	capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
+
+	nodeLifeTime: cache item lifetime
+*/
+func NewCache[K comparable, V any](capacity int) *Cache[K, V] {
+	return &Cache[K, V]{
+		capacity: capacity,
+		data:     make(map[K]*node[K, V], capacity),
+	}
+}
+
+/*
+WithTimeout sets the lifetime of an element in the cache.
+if the lifetime is exceeded, the element will not be returned, it will be removed on Get request
+*/
+func (c *Cache[K, V]) WithTimeout(nodeLifeTime time.Duration) *Cache[K, V] {
+	c.lifeTime = nodeLifeTime
+	c.withTimeout = true
+	return c
 }
 
 // unsafeAddToTail thread-unsafe add element to end of linked-list
@@ -96,21 +121,6 @@ func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 	node.next.previous = nil
 }
 
-/*
-NewCache init new cache. Key must be comparable
-
-	capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
-
-	nodeLifeTime: cache item lifetime
-*/
-func NewCache[K comparable, V any](capacity int, nodeLifeTime time.Duration) *Cache[K, V] {
-	return &Cache[K, V]{
-		capacity: capacity,
-		data:     make(map[K]*node[K, V], capacity),
-		lifeTime: nodeLifeTime,
-	}
-}
-
 // CacheSize number of items in the cache at the moment
 func (c *Cache[K, V]) CacheSize() int {
 	c.mu.Lock()
@@ -160,7 +170,7 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 		return c.zeroVal, false
 	}
 
-	if time.Since(node.time) > c.lifeTime {
+	if c.withTimeout && time.Since(node.time) > c.lifeTime {
 		c.unsafeDelete(node)
 		return c.zeroVal, false
 	}
