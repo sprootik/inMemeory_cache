@@ -11,7 +11,7 @@ import (
 var cache *Cache[int, int]
 
 func init() {
-	cache = NewCache[int, int](1000, 1*time.Second)
+	cache = NewCache[int, int](1000).WithTimeout(1*time.Second)
 }
 
 func TestCache(t *testing.T) {
@@ -43,7 +43,7 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	cache := NewCache[int, struct{}](1000, 30*time.Second)
+	cache := NewCache[int, struct{}](1000).WithTimeout(30*time.Second)
 	b.ResetTimer()
 	b.Run("Add element", func(b *testing.B) {
 		for j := 0; j < b.N; j++ {
@@ -78,8 +78,8 @@ func printCache(cache *Cache[int, int], caseNum int) {
 	fmt.Printf("==== %d case =====\n", caseNum)
 	defer fmt.Println("=================")
 
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
+	// cache.mu.Lock()
+	// defer cache.mu.Unlock()
 
 	fmt.Printf("head: %p, tail %p\n", cache.head, cache.tail)
 	h := cache.head
@@ -91,7 +91,7 @@ func printCache(cache *Cache[int, int], caseNum int) {
 	}
 }
 func TestCorrectWork(t *testing.T) {
-	cache := NewCache[int, int](3, time.Millisecond)
+	cache := NewCache[int, int](3).WithTimeout(time.Millisecond)
 
 	ok := cache.Add(0, 0)
 	if !ok {
