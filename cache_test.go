@@ -11,7 +11,7 @@ import (
 var cache *Cache[int, int]
 
 func init() {
-	cache = NewCache[int, int](1000).WithTimeout(1*time.Second)
+	cache = NewCache[int, int](1000)
 }
 
 func TestCache(t *testing.T) {
