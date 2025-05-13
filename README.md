@@ -1,6 +1,6 @@
 Eng | [Rus](./README-ru.md)   
 
-This project implements a thread-safe in-memory lru cache with delete based on the element's lifetime.
+This project implements a thread-safe in-memory LRU/TLRU cache.
 Algorithmic complexity of work is O(1). 
 
 *** 

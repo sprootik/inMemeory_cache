@@ -1,12 +1,13 @@
 // Package cache
 /*
-The package implements an in-memory LRU cache consisting of elements, optionally with a time to live.
+The package implements an in-memory LRU/TLRU cache consisting of elements.
 This cache is thread safe.
 Algorithmic complexity of work is O(1).
 */
 package cache
 
 import (
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -29,6 +30,7 @@ type Cache[K comparable, V any] struct {
 	mu          sync.Mutex
 	lifeTime    time.Duration
 	withTimeout bool
+	jitter      func() time.Duration
 	zeroVal     V
 }
 
@@ -43,16 +45,33 @@ func NewCache[K comparable, V any](capacity int) *Cache[K, V] {
 	return &Cache[K, V]{
 		capacity: capacity,
 		data:     make(map[K]*node[K, V], capacity),
+		jitter:   func() time.Duration { return 0 },
 	}
 }
 
 /*
-WithTimeout sets the lifetime of an element in the cache.
+WithTimeout sets the lifetime of an element in the cache (TLRU).
 if the lifetime is exceeded, the element will not be returned, it will be removed on Get request
 */
 func (c *Cache[K, V]) WithTimeout(nodeLifeTime time.Duration) *Cache[K, V] {
+	c.mu.Lock()
 	c.lifeTime = nodeLifeTime
 	c.withTimeout = true
+	c.mu.Unlock()
+	return c
+}
+
+// WithJitter sets jitter equal to t for lifetime of an element in the cache
+func (c *Cache[K, V]) WithJitter(t time.Duration) *Cache[K, V] {
+	if t == 0 {
+		return c
+	}
+
+	c.mu.Lock()
+	c.jitter = func() time.Duration {
+		return time.Duration(rand.Int63n(int64(t))) * time.Nanosecond
+	}
+	c.mu.Unlock()
 	return c
 }
 
@@ -170,7 +189,7 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 		return c.zeroVal, false
 	}
 
-	if c.withTimeout && time.Since(node.time) > c.lifeTime {
+	if c.withTimeout && time.Since(node.time) > c.lifeTime+c.jitter() {
 		c.unsafeDelete(node)
 		return c.zeroVal, false
 	}

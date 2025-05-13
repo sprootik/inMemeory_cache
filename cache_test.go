@@ -43,7 +43,7 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	cache := NewCache[int, struct{}](1000).WithTimeout(30*time.Second)
+	cache := NewCache[int, struct{}](1000).WithTimeout(30 * time.Second).WithJitter(time.Second)
 	b.ResetTimer()
 	b.Run("Add element", func(b *testing.B) {
 		for j := 0; j < b.N; j++ {
@@ -190,5 +190,26 @@ func TestCorrectWork(t *testing.T) {
 	}
 	if cache.head != cache.tail || cache.tail.next != nil || cache.tail.previous != nil {
 		t.Fatal("8 case")
+	}
+}
+
+func TestJitter(t *testing.T) {
+	const count = 1000
+	cache = NewCache[int, int](1000).WithTimeout(time.Millisecond).WithJitter(time.Millisecond)
+
+	for i := range count {
+		cache.Add(i, i)
+	}
+
+	time.Sleep(time.Millisecond)
+
+	for i := range count {
+		cache.Get(i)
+
+	}
+
+	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	if cache.CacheSize() == 1000 {
+		t.Fatal("cache size")
 	}
 }

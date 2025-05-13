@@ -9,8 +9,9 @@ import (
 )
 
 func main() {
-	// initiate a new cache with an item lifetime of 1 seconds. Key must be comparable
-	c := cache.NewCache[int, string](1000).WithTimeout(1 * time.Second)
+	// initiate a new cache with an item lifetime (TLRU) of 1 seconds. Key must be comparable
+	// If desired, you can add time-to-live jitter to spread the load on the storage during cache eviction.
+	c := cache.NewCache[int, string](1000).WithTimeout(1 * time.Second).WithJitter(time.Millisecond)
 
 	// add 1001 elements in cache.
 	// The cache will only have the last 1000 elements since the capacity is 1000
