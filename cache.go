@@ -73,6 +73,64 @@ func (c *Cache[K, V]) WithJitter(t time.Duration) *Cache[K, V] {
 	return c
 }
 
+// CacheSize number of items in the cache at the moment
+func (c *Cache[K, V]) CacheSize() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return len(c.data)
+}
+
+// CacheCapacity current cache capacity
+func (c *Cache[K, V]) CacheCapacity() int {
+	return c.capacity
+}
+
+// Add add the element in cache. will return true if a new element was added.
+// If an element was updated returns false.
+func (c *Cache[K, V]) Add(key K, value V) bool {
+	start := time.Now()
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// update exist element
+	if nd, ok := c.data[key]; ok {
+		nd.value = value
+		nd.time = start
+		c.unsafeMoveToTail(nd)
+		return false
+
+	}
+
+	// delete of the latter when the size is exceeded
+	if len(c.data) >= c.capacity {
+		c.unsafeDelete(c.head)
+	}
+
+	c.unsafeAddToTail(&node[K, V]{key: key, value: value, time: start})
+	return true
+}
+
+// Get get from cache by key. Return true if value in cache
+func (c *Cache[K, V]) Get(key K) (V, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	node, ok := c.data[key]
+
+	if !ok {
+		return c.zeroVal, false
+	}
+
+	if c.withTimeout && time.Since(node.time) > c.lifeTime+c.jitter() {
+		c.unsafeDelete(node)
+		return c.zeroVal, false
+	}
+
+	c.unsafeMoveToTail(node)
+	return node.value, true
+}
+
 // unsafeAddToTail thread-unsafe add element to end of linked-list
 func (c *Cache[K, V]) unsafeAddToTail(node *node[K, V]) {
 	c.data[node.key] = node
@@ -136,62 +194,4 @@ func (c *Cache[K, V]) unsafeMoveToTail(node *node[K, V]) {
 	// [x] - [] - []
 	c.head = node.next
 	node.next.previous = nil
-}
-
-// CacheSize number of items in the cache at the moment
-func (c *Cache[K, V]) CacheSize() int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return len(c.data)
-}
-
-// CacheCapacity current cache capacity
-func (c *Cache[K, V]) CacheCapacity() int {
-	return c.capacity
-}
-
-// Add add the element in cache. will return true if a new element was added.
-// If an element was updated returns false.
-func (c *Cache[K, V]) Add(key K, value V) bool {
-	start := time.Now()
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	// update exist element
-	if nd, ok := c.data[key]; ok {
-		nd.value = value
-		nd.time = start
-		c.unsafeMoveToTail(nd)
-		return false
-
-	}
-
-	// delete of the latter when the size is exceeded
-	if len(c.data) >= c.capacity {
-		c.unsafeDelete(c.head)
-	}
-
-	c.unsafeAddToTail(&node[K, V]{key: key, value: value, time: start})
-	return true
-}
-
-// Get get from cache by key. Return true if value in cache
-func (c *Cache[K, V]) Get(key K) (V, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	node, ok := c.data[key]
-
-	if !ok {
-		return c.zeroVal, false
-	}
-
-	if c.withTimeout && time.Since(node.time) > c.lifeTime+c.jitter() {
-		c.unsafeDelete(node)
-		return c.zeroVal, false
-	}
-
-	c.unsafeMoveToTail(node)
-	return node.value, true
 }
