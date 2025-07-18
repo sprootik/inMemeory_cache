@@ -1,3 +1,8 @@
+goCheck:
+	go vet $$( go list ./... | grep -v vendor)
+	go fmt ./...
+	go mod tidy
+
 testCacheCorrect:
 	go test -count=1 -run ^TestCorrectWork$$ -v .
 
