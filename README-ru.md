@@ -1,4 +1,4 @@
-Данный проект реализует потокобезопасный in-memory LRU/TLRU кэш,
+Данный проект реализует простой потокобезопасный in-memory LRU/TLRU кэш,
 Алгоритмическая сложностью работы O(1).
 
 *** 
@@ -6,6 +6,13 @@
 ```
 go get github.com/sprootik/inMemeory_cache@latest
 ```
+
+***
+### Документация
+```
+https://pkg.go.dev/github.com/sprootik/inMemeory_cache
+```
+
 ***
 ### Примеры использования
 Смотри [example](./examples/main.go)

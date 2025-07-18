@@ -38,8 +38,6 @@ type Cache[K comparable, V any] struct {
 NewCache init new cache. Key must be comparable
 
 	capacity: this is the capacity of the lru cache. If the number of added elements is greater than the capacity the last element is removed
-
-	nodeLifeTime: cache item lifetime
 */
 func NewCache[K comparable, V any](capacity int) *Cache[K, V] {
 	return &Cache[K, V]{

@@ -16,7 +16,7 @@ func main() {
 	// add 1001 elements in cache.
 	// The cache will only have the last 1000 elements since the capacity is 1000
 	var wg sync.WaitGroup
-	for i := 0; i < 1001; i++ {
+	for i := range 1001 {
 		wg.Add(1)
 		go func() {
 			key := i
@@ -33,7 +33,7 @@ func main() {
 	// get value from cache by key. After second.
 	// after a second, the elements are considered not relevant, since the lifetime is 1 second.
 	// The element will be removed from the cache upon request
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		key := 666
 		value, ok := c.Get(key)
 		if !ok {

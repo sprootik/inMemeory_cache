@@ -1,12 +1,18 @@
 Eng | [Rus](./README-ru.md)   
 
-This project implements a thread-safe in-memory LRU/TLRU cache.
+This project implements a simple thread-safe in-memory LRU/TLRU cache.
 Algorithmic complexity of work is O(1). 
 
 *** 
 ### Installation  
 ```
 go get github.com/sprootik/inMemeory_cache@latest
+```
+
+***
+### Documentation
+```
+https://pkg.go.dev/github.com/sprootik/inMemeory_cache
 ```
 
 ***
