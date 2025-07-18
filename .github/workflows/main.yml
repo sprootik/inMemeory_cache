@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  linux:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -30,3 +30,46 @@ jobs:
     - name: Test Race
       run: make testCacheRace
 
+  macos:
+    runs-on:  macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Check code style
+      run : make goCheck
+
+    - name: Test Correct Work
+      run: make testCacheCorrect
+   
+    - name: Test Jitter
+      run: make testCacheJitter
+
+    - name: Test Race
+      run: make testCacheRace
+
+  windows:
+    runs-on:  windows-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Check code style
+      run : make goCheck
+
+    - name: Test Correct Work
+      run: make testCacheCorrect
+   
+    - name: Test Jitter
+      run: make testCacheJitter
+
+    - name: Test Race
+      run: make testCacheRace
