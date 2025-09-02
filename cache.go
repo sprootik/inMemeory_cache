@@ -14,23 +14,25 @@ import (
 
 // node linked list cache element
 type node[K comparable, V any] struct {
-	key      K
-	value    V
-	time     time.Time
+	key   K
+	value V
+	// time unix timestamp
+	time     int64
 	next     *node[K, V]
 	previous *node[K, V]
 }
 
 // Cache cache structure
 type Cache[K comparable, V any] struct {
-	capacity    int
-	head        *node[K, V]
-	tail        *node[K, V]
-	data        map[K]*node[K, V]
-	mu          sync.Mutex
-	lifeTime    time.Duration
+	capacity int
+	head     *node[K, V]
+	tail     *node[K, V]
+	data     map[K]*node[K, V]
+	mu       sync.Mutex
+	// ttl unix timestamp
+	ttl         int64
 	withTimeout bool
-	jitter      func() time.Duration
+	jitter      func() int64
 	zeroVal     V
 }
 
@@ -43,7 +45,7 @@ func NewCache[K comparable, V any](capacity int) *Cache[K, V] {
 	return &Cache[K, V]{
 		capacity: capacity,
 		data:     make(map[K]*node[K, V], capacity),
-		jitter:   func() time.Duration { return 0 },
+		jitter:   func() int64 { return 0 },
 	}
 }
 
@@ -53,7 +55,7 @@ if the lifetime is exceeded, the element will not be returned, it will be remove
 */
 func (c *Cache[K, V]) WithTimeout(nodeLifeTime time.Duration) *Cache[K, V] {
 	c.mu.Lock()
-	c.lifeTime = nodeLifeTime
+	c.ttl = nodeLifeTime.Nanoseconds()
 	c.withTimeout = true
 	c.mu.Unlock()
 	return c
@@ -66,8 +68,8 @@ func (c *Cache[K, V]) WithJitter(t time.Duration) *Cache[K, V] {
 	}
 
 	c.mu.Lock()
-	c.jitter = func() time.Duration {
-		return time.Duration(rand.Int63n(int64(t))) * time.Nanosecond
+	c.jitter = func() int64 {
+		return rand.Int63n(t.Nanoseconds())
 	}
 	c.mu.Unlock()
 	return c
@@ -88,7 +90,7 @@ func (c *Cache[K, V]) CacheCapacity() int {
 // Add add the element in cache. will return true if a new element was added.
 // If an element was updated returns false.
 func (c *Cache[K, V]) Add(key K, value V) bool {
-	start := time.Now()
+	start := time.Now().UnixNano()
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -122,7 +124,7 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 		return c.zeroVal, false
 	}
 
-	if c.withTimeout && time.Since(node.time) > c.lifeTime+c.jitter() {
+	if c.withTimeout && time.Now().UnixNano()-node.time > c.ttl+c.jitter() {
 		c.unsafeDelete(node)
 		return c.zeroVal, false
 	}
