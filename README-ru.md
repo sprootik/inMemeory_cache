@@ -24,19 +24,19 @@ goos: linux
 goarch: amd64
 pkg: github.com/sprootik/inMemeory_cache
 cpu: AMD Ryzen 7 6800H with Radeon Graphics         
-BenchmarkCache/Add_element-16            7307991               159.6 ns/op            48 B/op          1 allocs/op
-BenchmarkCache/Add_element-16            6952244               166.7 ns/op            48 B/op          1 allocs/op
-BenchmarkCache/Add_element-16            7123704               166.9 ns/op            48 B/op          1 allocs/op
-BenchmarkCache/Add_element-16            7097658               167.5 ns/op            48 B/op          1 allocs/op
-BenchmarkCache/Add_element-16            7045665               162.8 ns/op            48 B/op          1 allocs/op
-BenchmarkCache/Get_element-16           51850240                22.77 ns/op            0 B/op          0 allocs/op
-BenchmarkCache/Get_element-16           50203240                22.80 ns/op            0 B/op          0 allocs/op
-BenchmarkCache/Get_element-16           52538589                22.78 ns/op            0 B/op          0 allocs/op
-BenchmarkCache/Get_element-16           50939607                22.78 ns/op            0 B/op          0 allocs/op
-BenchmarkCache/Get_element-16           52898586                22.78 ns/op            0 B/op          0 allocs/op
-BenchmarkCache/Get_element_with_timeout-16              168130641                6.256 ns/op           0 B/op          0 allocs/op
-BenchmarkCache/Get_element_with_timeout-16              191839611                6.261 ns/op           0 B/op          0 allocs/op
-BenchmarkCache/Get_element_with_timeout-16              191384476                6.262 ns/op           0 B/op          0 allocs/op
-BenchmarkCache/Get_element_with_timeout-16              191603686                6.266 ns/op           0 B/op          0 allocs/op
-BenchmarkCache/Get_element_with_timeout-16              191220027                6.270 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Add_element-16           10140134               116.6 ns/op            32 B/op          1 allocs/op
+BenchmarkCache/Add_element-16            9573124               124.0 ns/op            32 B/op          1 allocs/op
+BenchmarkCache/Add_element-16            9321261               124.2 ns/op            32 B/op          1 allocs/op
+BenchmarkCache/Add_element-16            9260470               123.8 ns/op            32 B/op          1 allocs/op
+BenchmarkCache/Add_element-16            7964702               171.4 ns/op            32 B/op          1 allocs/op
+BenchmarkCache/Get_element-16           37832053                31.65 ns/op            0 B/op          0 allocs/op
+BenchmarkCache/Get_element-16           38113810                31.57 ns/op            0 B/op          0 allocs/op
+BenchmarkCache/Get_element-16           48150932                22.21 ns/op            0 B/op          0 allocs/op
+BenchmarkCache/Get_element-16           50007607                22.40 ns/op            0 B/op          0 allocs/op
+BenchmarkCache/Get_element-16           51462730                22.34 ns/op            0 B/op          0 allocs/op
+BenchmarkCache/Get_element_with_timeout-16              229280216                5.242 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_with_timeout-16              228699200                5.444 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_with_timeout-16              223116471                5.355 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_with_timeout-16              218576280                5.374 ns/op           0 B/op          0 allocs/op
+BenchmarkCache/Get_element_with_timeout-16              221789240                5.397 ns/op           0 B/op          0 allocs/op
 ```
