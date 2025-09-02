@@ -43,7 +43,7 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	cache := NewCache[int, struct{}](1000).WithTimeout(30 * time.Second).WithJitter(time.Second)
+	cache := NewCache[int, struct{}](1000).WithTimeout(30 * time.Second)
 	b.ResetTimer()
 	b.Run("Add element", func(b *testing.B) {
 		for j := 0; j < b.N; j++ {
