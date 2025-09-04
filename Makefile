@@ -12,6 +12,9 @@ testCacheRace:
 testCacheJitter:
 	go test -count=1 -run ^TestJitter$$ -v .
 
+testCacheMod:
+	go test -count=1 -run ^TestMod* -v .
+
 testCacheBench:
 	@go test -benchmem -count=5 -run=^$$ -bench ^BenchmarkCache$$ .
 
