@@ -2,74 +2,82 @@ name: Cache
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-
   linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
 
-    - name: Check code style
-      run : make goCheck
+      - name: Check code style
+        run: make goCheck
 
-    - name: Test Correct Work
-      run: make testCacheCorrect
-   
-    - name: Test Jitter
-      run: make testCacheJitter
+      - name: Test Correct Work
+        run: make testCacheCorrect
 
-    - name: Test Race
-      run: make testCacheRace
+      - name: Test Jitter
+        run: make testCacheJitter
+
+      - name: Test Race
+        run: make testCacheRace
+
+      - name: Test Modifiers
+        run: make testCacheMod
 
   macos:
-    runs-on:  macos-latest
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
 
-    - name: Check code style
-      run : make goCheck
+      - name: Check code style
+        run: make goCheck
 
-    - name: Test Correct Work
-      run: make testCacheCorrect
-   
-    - name: Test Jitter
-      run: make testCacheJitter
+      - name: Test Correct Work
+        run: make testCacheCorrect
 
-    - name: Test Race
-      run: make testCacheRace
+      - name: Test Jitter
+        run: make testCacheJitter
+
+      - name: Test Race
+        run: make testCacheRace
+
+      - name: Test Modifiers
+        run: make testCacheMod
 
   windows:
-    runs-on:  windows-latest
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
 
-    - name: Check code style
-      run : make goCheck
+      - name: Check code style
+        run: make goCheck
 
-    - name: Test Correct Work
-      run: make testCacheCorrect
-   
-    - name: Test Jitter
-      run: make testCacheJitter
+      - name: Test Correct Work
+        run: make testCacheCorrect
 
-    - name: Test Race
-      run: make testCacheRace
+      - name: Test Jitter
+        run: make testCacheJitter
+
+      - name: Test Race
+        run: make testCacheRace
+
+      - name: Test Modifiers
+        run: make testCacheMod
