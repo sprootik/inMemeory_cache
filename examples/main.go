@@ -44,4 +44,21 @@ func main() {
 		fmt.Printf("c size: %d\n", c.CacheSize())
 		time.Sleep(1 * time.Second)
 	}
+
+	/* if you want to override ttl for an element you can do it when receiving using modifiers
+	This will override the lifetime (without jitter) of the element when received,
+	all preemptive logic will work based on the newTottle for this request
+	*/
+
+	for range 2 {
+		key := 777
+		value, ok := c.Get(key, cache.ChangeTTL(time.Hour))
+		if !ok {
+			fmt.Printf("key with change ttl %d not found\n", key)
+		} else {
+			fmt.Printf("key: %d with change ttl found in cache, value: %s\n", key, value)
+		}
+	}
+	// show cache size
+	fmt.Printf("c size: %d\n", c.CacheSize())
 }
