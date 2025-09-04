@@ -114,7 +114,16 @@ func (c *Cache[K, V]) Add(key K, value V) bool {
 }
 
 // Get get from cache by key. Return true if value in cache
-func (c *Cache[K, V]) Get(key K) (V, bool) {
+func (c *Cache[K, V]) Get(key K, mod ...modifires) (V, bool) {
+	var sumMod modifires
+	if len(mod) > 0 {
+		for _, v := range mod {
+			if v.ttl > 0 {
+				sumMod.ttl = v.ttl
+			}
+		}
+	}
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -124,7 +133,11 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 		return c.zeroVal, false
 	}
 
-	if c.withTimeout && time.Now().UnixNano()-node.time > c.ttl+c.jitter() {
+	ttl := c.ttl + c.jitter()
+	if sumMod.ttl > 0 {
+		ttl = sumMod.ttl
+	}
+	if c.withTimeout && time.Now().UnixNano()-node.time > ttl {
 		c.unsafeDelete(node)
 		return c.zeroVal, false
 	}

@@ -194,14 +194,18 @@ func TestCorrectWork(t *testing.T) {
 }
 
 func TestJitter(t *testing.T) {
-	const count = 1000
-	cache = NewCache[int, int](1000).WithTimeout(time.Millisecond).WithJitter(time.Millisecond)
+	const (
+		count = 1000
+		ttl   = time.Millisecond
+	)
+
+	cache = NewCache[int, int](1000).WithTimeout(ttl).WithJitter(ttl)
 
 	for i := range count {
 		cache.Add(i, i)
 	}
 
-	time.Sleep(time.Millisecond)
+	time.Sleep(ttl)
 
 	for i := range count {
 		cache.Get(i)
@@ -210,6 +214,29 @@ func TestJitter(t *testing.T) {
 
 	fmt.Printf("Cache size: %d\n", cache.CacheSize())
 	if cache.CacheSize() == 1000 {
+		t.Fatal("cache size")
+	}
+}
+
+func TestModTTL(t *testing.T) {
+	const (
+		count = 1000
+		ttl   = time.Millisecond
+	)
+	cache = NewCache[int, int](1000).WithTimeout(ttl).WithJitter(ttl)
+
+	for i := range count {
+		cache.Add(i, i)
+	}
+
+	time.Sleep(ttl)
+
+	for i := range count {
+		cache.Get(i, ChangeTTL(time.Hour))
+	}
+
+	fmt.Printf("Cache size: %d\n", cache.CacheSize())
+	if cache.CacheSize() != 1000 {
 		t.Fatal("cache size")
 	}
 }
